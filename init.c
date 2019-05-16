@@ -6,6 +6,9 @@
 
 #define MAXSIZE     27
 
+// reference: https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_73/apiref/apiexusmem.htm
+
+
 void die(char *s)
 {
     perror(s);
