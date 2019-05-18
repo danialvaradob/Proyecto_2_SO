@@ -9,7 +9,7 @@
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
 enum ProcessState{RUNNING, BLOCKED, IN_CRITICAL_REGION};
-
+sem_t mutex;
 
 /* info used by our threadsx */
 struct processInfo {
@@ -27,21 +27,25 @@ void* best_fit(void* pInfo){
 
 void* printProcessState(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
+  printf("Hi. I'm the %lu process\n", args->PID);
   printf("I am going to sleep now \n");
   for (int i = 0; i<args->execution_time;i++){
-    printf("%d",args->size);
+    printf(".");//("%d",args->size);
     fflush(stdout);
-    sleep(0.8);
+    sleep(1);
   }
-  printf("I'm wide awake now. Bye \n");
+  printf("\nI'm wide awake now. Bye \n");
   //pthread_exit((void *)0);
   //sleep(args->execution_time);
 }
 
 void writeLog(int exec_time, int proc_size){
     FILE *fp;
-    //char str[10000];
     char* filename = "log.txt";
+
+    /*Waiting for the semaphore*/
+    sem_wait(&mutex);
+
     /*Reading file and creating maze */
     fp = fopen(filename, "a");
 
@@ -49,6 +53,7 @@ void writeLog(int exec_time, int proc_size){
         printf("Could not open file %s",filename);
     }
 
+    /*Getting the datetime for the log entry*/
     time_t t = time(NULL);
     struct tm *tm = localtime(&t);
     char s[64];
@@ -60,9 +65,13 @@ void writeLog(int exec_time, int proc_size){
     fflush(fp);
     fclose(fp);
 
+    /*Releasing the semaphore*/
+    sem_post(&mutex);
+
 }
 int main(){
     int proc_size, exec_time, producer_wait;
+    sem_init(&mutex, 0, 1);
 
 
 
@@ -77,7 +86,7 @@ int main(){
       proc_size = rand() % 10 + 1;
       exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
 
-      pthread_t PID;
+      pthread_t PID = pthread_self();
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
       pthread_create(&PID, NULL, printProcessState, &pinfo);
       writeLog(exec_time, proc_size);
@@ -88,7 +97,7 @@ int main(){
       sleep(producer_wait);
 
     }
-
+    sem_destroy(&mutex);
     return 0;
 }
 
@@ -97,3 +106,5 @@ int main(){
 //Bibliography
 //https://www.geeksforgeeks.org/generating-random-number-range-c/
 //http://users.cs.cf.ac.uk/Dave.Marshall/C/node27.html
+//http://www.zentut.com/c-tutorial/c-write-text-file/
+//https://www.geeksforgeeks.org/use-posix-semaphores-c/
