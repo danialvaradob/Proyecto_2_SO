@@ -1,0 +1,5 @@
+Process/thread created with 4 lines and 56 s of execution time on Sat May 18 15:43:10 2019
+Process/thread created with 6 lines and 27 s of execution time on Sat May 18 15:43:43 2019
+Process/thread created with 7 lines and 52 s of execution time on Sat May 18 15:44:31 2019
+Process/thread created with 2 lines and 47 s of execution time on Sat May 18 15:45:18 2019
+Process/thread created with 1 lines and 26 s of execution time on Sat May 18 15:46:01 2019

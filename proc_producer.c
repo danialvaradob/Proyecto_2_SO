@@ -3,6 +3,8 @@
 #include <semaphore.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
+#include <assert.h>
 
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
@@ -19,23 +21,47 @@ struct processInfo {
     enum ProcessState state;   /* The current state of the process */
 };
 
+void* best_fit(void* pInfo){
+
+}
+
 void* printProcessState(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
   printf("I am going to sleep now \n");
   for (int i = 0; i<args->execution_time;i++){
     printf("%d",args->size);
     fflush(stdout);
-    sleep(1);
+    sleep(0.8);
   }
   printf("I'm wide awake now. Bye \n");
   //pthread_exit((void *)0);
   //sleep(args->execution_time);
 }
 
+void writeLog(int exec_time, int proc_size){
+    FILE *fp;
+    //char str[10000];
+    char* filename = "log.txt";
+    /*Reading file and creating maze */
+    fp = fopen(filename, "a");
 
-int main()
-{
+    if (fp == NULL){
+        printf("Could not open file %s",filename);
+    }
 
+    time_t t = time(NULL);
+    struct tm *tm = localtime(&t);
+    char s[64];
+    assert(strftime(s, sizeof(s), "%c", tm));
+
+    fprintf(fp,
+      "Process/thread created with %d lines and %d s of execution time on %s\n",
+      proc_size, exec_time, s);
+    fflush(fp);
+    fclose(fp);
+
+}
+int main(){
     int proc_size, exec_time, producer_wait;
 
 
@@ -54,7 +80,7 @@ int main()
       pthread_t PID;
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
       pthread_create(&PID, NULL, printProcessState, &pinfo);
-      printf("create_thread with %d lines and %d s of execution time\n", proc_size, exec_time);
+      writeLog(exec_time, proc_size);
       pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
