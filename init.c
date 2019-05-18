@@ -1,17 +1,4 @@
 // reference: https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_73/apiref/apiexusmem.htm
-/*********************************************************************/
-/*********************************************************************/
-/*                                                                   */
-/* FUNCTION:  This program acts as a server to the client program.   */
-/*                                                                   */
-/* LANGUAGE:  ILE C                                                  */
-/*                                                                   */
-/* APIs USED: semctl(), semget(), semop(),                           */
-/*            shmat(), shmctl(), shmdt(), shmget()                   */
-/*            ftok()                                                 */
-/*                                                                   */
-/*********************************************************************/
-/*********************************************************************/
 
 #include <stdio.h>
 #include <string.h>
@@ -25,7 +12,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 2               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 50         /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -74,10 +61,10 @@ int main(int argc, char *argv[])
     /*        '1' --  The shared memory segment is being used.       */
     /*        '0' --  The shared memory segment is freed.            */
     /* The second semaphore in the sem set means:                    */
-    /*        '1' --  The shared memory segment has been changed by  */
-    /*                the client.                                    */
-    /*        '0' --  The shared memory segment has not been         */
-    /*                changed by the client.                         */
+    /*        '1' --  A process is reading the information in the  	 */
+    /*                memory segment                                 */
+    /*        '0' --  No process is currently reading the memmory    */
+    /*                segment   			                         */
 
     sarray[0] = 0;
     sarray[1] = 0;
