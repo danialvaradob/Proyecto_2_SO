@@ -12,18 +12,26 @@ enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
 enum ProcessState{RUNNING, BLOCKED, IN_CRITICAL_REGION};
 sem_t mutex;
 
+enum AlgorithmType selected_algorithm;
+
 /* info used by our threadsx */
 struct processInfo {
 
     pthread_t     PID;         /* ID returned by pthread_create() */
-    int           base_register;     /* Stores the process' starting memory address */
+    int           base_register;/* Stores the process' starting memory address*/
     int           size;        /* The size (in lines) of the process */
-    int           execution_time; /* Amount of time the process is going to sleep */
+    int           execution_time;/*Amount of time the process is going to sleep*/
     enum ProcessState state;   /* The current state of the process */
 };
 
-void* allocate_memory(enum AlgorithmType algorithm){
-
+void* allocate_memory(){
+  if (selected_algorithm == BEST){
+    printf("Algoritmo Best-fit\n\n");
+  }else if (selected_algorithm == FIRST){
+    printf("Algoritmo First-fit\n\n");
+  }else if (selected_algorithm == WORST){
+    printf("Algoritmo Worst-fit\n\n");
+  }
 
 }
 
@@ -79,11 +87,23 @@ int main(){
 
 
     enum AlgorithmType algorithmNumber;
-    printf(" 1) Best-fit \n 2) First-fit \n 3) Worst-fit \n");
-    printf("Select the algorithm: ");
-    scanf("%d",&algorithmNumber);
 
-    printf("Number = %d\n",(int)algorithmNumber);
+    while (1){
+      printf(" 1) Best-fit \n 2) First-fit \n 3) Worst-fit \n");
+      printf("Select the algorithm: ");
+      scanf("%d",&algorithmNumber);
+      if (algorithmNumber > 0 && algorithmNumber < 4){
+        break;
+      }else{
+        printf("\n ERROR \n Ingrese un numero del 1 al 3 \n");
+      }
+    }
+
+
+    selected_algorithm = algorithmNumber;
+
+    allocate_memory();
+
 
     while (1){
       proc_size = rand() % 10 + 1;
