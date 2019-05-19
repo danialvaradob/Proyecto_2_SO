@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <assert.h>
+#include <sys/syscall.h>
 
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
@@ -21,13 +22,15 @@ struct processInfo {
     enum ProcessState state;   /* The current state of the process */
 };
 
-void* best_fit(void* pInfo){
+void* allocate_memory(enum AlgorithmType algorithm){
+
 
 }
 
-void* printProcessState(void* pInfo){
+
+void* print_process_state(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
-  printf("Hi. I'm the %lu process\n", args->PID);
+  printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
   printf("I am going to sleep now \n");
   for (int i = 0; i<args->execution_time;i++){
     printf(".");//("%d",args->size);
@@ -39,7 +42,7 @@ void* printProcessState(void* pInfo){
   //sleep(args->execution_time);
 }
 
-void writeLog(int exec_time, int proc_size){
+void write_log(int exec_time, int proc_size){
     FILE *fp;
     char* filename = "log.txt";
 
@@ -86,10 +89,10 @@ int main(){
       proc_size = rand() % 10 + 1;
       exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
 
-      pthread_t PID = pthread_self();
+      pthread_t PID;// = pthread_self();
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
-      pthread_create(&PID, NULL, printProcessState, &pinfo);
-      writeLog(exec_time, proc_size);
+      pthread_create(&PID, NULL, print_process_state, &pinfo);
+      write_log(exec_time, proc_size);
       pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
