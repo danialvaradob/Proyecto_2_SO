@@ -81,13 +81,17 @@ int main(int argc, char *argv[])
     /* Check if the second semaphore is 0. If its no, the the spy    */
     /* process i allowed to read the shared memory					 */
     /* for the semaphore to reach zero before running the semop().   */
-
-
+	operations[0].sem_num = 0;
+                                    /* Operate on the first sem      */
+    operations[0].sem_op =  0;
+                                    /* Wait for the value to be=0    */
+    operations[0].sem_flg = 0;
+                                    /* Allow a wait to occur         */
 
     operations[1].sem_num = 0;
-                                   /* Operate on the second sem(read)*/
+                                    /* Operate on the first sem      */
     operations[1].sem_op =  1;
-                                   /* Increment the semval by one    */
+                                    /* Increment the semval by one   */
     operations[1].sem_flg = 0;
                                     /* Allow a wait to occur         */
 
@@ -110,14 +114,8 @@ int main(int argc, char *argv[])
     operations[0].sem_flg = 0;
                                     /* Allow a wait to occur         */
 
-    operations[1].sem_num = 1;
-                                    /* Operate on the second sem     */
-    operations[1].sem_op =  1;
-                                    /* Increment the semval by one   */
-    operations[1].sem_flg = 0;
-                                    /* Allow a wait to occur         */
 
-    rc = semop( semid, operations, 2 );
+    rc = semop( semid, operations, 1 );
     if (rc == -1)
       {
         printf("main: semop() failed\n");

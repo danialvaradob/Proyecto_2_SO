@@ -11,7 +11,7 @@
 #define SHMKEYPATH "/dev/null"  /* Path used on ftok for shmget key  */
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
-#define NUMSEMS 2               /* Num of sems in created sem set    */
+#define NUMSEMS 1               /* Num of sems in created sem set    */
 #define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
@@ -47,10 +47,11 @@ int main(int argc, char *argv[])
     /* exists for the key, return an error. The specified permissions*/
     /* give everyone read/write access to the semaphore set.         */
 
-    semid = semget( semkey, NUMSEMS, 0666 | IPC_CREAT | IPC_EXCL );
+    
+	semid = semget( semkey, NUMSEMS, 0666 | IPC_CREAT | IPC_EXCL );
     if ( semid == -1 )
       {
-        printf("main: semget() failed\n");
+        printf("main1: semget() failed\n");
         return -1;
       }
 
@@ -60,24 +61,18 @@ int main(int argc, char *argv[])
     /* The first semaphore in the sem set means:                     */
     /*        '1' --  The shared memory segment is being used.       */
     /*        '0' --  The shared memory segment is freed.            */
-    /* The second semaphore in the sem set means:                    */
-    /*        '1' --  A process is reading the information in the  	 */
-    /*                memory segment                                 */
-    /*        '0' --  No process is currently reading the memmory    */
-    /*                segment   			                         */
 
     sarray[0] = 0;
-    sarray[1] = 0;
+
 
 
     /* The '1' on this command is a no-op, because the SETALL command*/
     /* is used.                                                      */
     rc = semctl( semid, 1, SETALL, sarray);
-    if(rc == -1)
-      {
+    if(rc == -1) {
         printf("main: semctl() initialization failed\n");
         return -1;
-      }
+    }
 
     /* Create a shared memory segment using the IPC key.  The        */
     /* size of the segment is a constant.  The specified permissions */
@@ -85,71 +80,88 @@ int main(int argc, char *argv[])
     /* If a shared memory segment already exists for this key,       */
     /* return an error.                                              */
     shmid = shmget(shmkey, SIZEOFSHMSEG, 0666 | IPC_CREAT | IPC_EXCL);
-    if (shmid == -1)
-      {
-        printf("main: shmget() failed\n");
+    if (shmid == -1) {
+        printf("main2: shmget() failed\n");
         return -1;
-      }
+    }
 
     /* Attach the shared memory segment to the server process.       */
     shm_address = shmat(shmid, NULL, 0);
-    if ( shm_address==NULL )
-      {
+    if ( shm_address== (char *) -1 ) {
         printf("main: shmat() failed\n");
         return -1;
-      }
+    }
     printf("Ready for client jobs\n");
 
-    /* Loop only a specified number of times for this example.       */
-    for (i=0; i < NUMMSG; i++)
-      {
+    
         /* Set the structure passed into the semop() to first wait   */
         /* for the second semval to equal 1, then decrement it to    */
         /* allow the next signal that the client writes to it.       */
-        /* Next, set the first semaphore to equal 1, which means     */
-        /* that the shared memory segment is busy.                   */
-        operations[0].sem_num = 1;
-                                    /* Operate on the second sem     */
-        operations[0].sem_op = -1;
-                                    /* Decrement the semval by one   */
-        operations[0].sem_flg = 0;
+        /* Set the first semaphore to equal -1, which means          */
+        /* that the shared memory segment is free.                   */
+    operations[0].sem_num = 0;
+    operations[0].sem_op =  -1;
+    operations[0].sem_flg = IPC_NOWAIT;
+
+    rc = semop( semid, operations, 1 );
+    if (rc == -1) {
+        printf("main1: semop() failed\n");
+        return -1;
+    
+    }
+       
+
+    operations[0].sem_num = 0;
+                                    /* Operate on the first sem      */
+    operations[0].sem_op =  0;
+                                    /* Wait for the value to be=0    */
+    operations[0].sem_flg = 0;
                                     /* Allow a wait to occur         */
 
-        operations[1].sem_num = 0;
+    operations[1].sem_num = 0;
                                     /* Operate on the first sem      */
-        operations[1].sem_op =  1;
-                                    /* Increment the semval by 1     */
-        operations[1].sem_flg = IPC_NOWAIT;
-                                          /* Do not allow to wait    */
+    operations[1].sem_op =  1;
+                                    /* Increment the semval by one   */
+    operations[1].sem_flg = 0;
+                                    /* Allow a wait to occur         */
 
-        rc = semop( semid, operations, 2 );
-        if (rc == -1)
-          {
-            printf("main: semop() failed\n");
-            return -1;
-          }
+    rc = semop( semid, operations, 2 );
+    if (rc == -1)
+      {
+        printf("main2: semop() failed\n");
+        return -1;
+     }
 
-        /* Print the shared memory contents.                         */
-        printf("Server Received : \"%s\"\n", (char *) shm_address);
+     int cmp = strcmp((char *) shm_address, "Hello from Client");
 
-        /* Signal the first semaphore to free the shared memory.     */
-        operations[0].sem_num = 0;
-        operations[0].sem_op  = -1;
-        operations[0].sem_flg = IPC_NOWAIT;
+     if (cmp) {
+		rc = semctl( semid, 1, IPC_RMID );
+	    if (rc==-1)
+	      {
+	        printf("main: semctl() remove id failed\n");
+	        return -1;
+	      }
+	    rc = shmdt(shm_address);
+	    if (rc==-1)
+	      {
+	        printf("main: shmdt() failed\n");
+	        return -1;
+	      }
+	    rc = shmctl(shmid, IPC_RMID, &shmid_struct);
+	    if (rc==-1)
+	      {
+	        printf("main: shmctl() failed\n");
+	        return -1;
+	      }
 
-        rc = semop( semid, operations, 1 );
-        if (rc == -1)
-          {
-            printf("main: semop() failed\n");
-            return -1;
-        }
+     }
 
-      }  /* End of FOR LOOP */
+
 
     /* Clean up the environment by removing the semid structure,     */
     /* detaching the shared memory segment, and then performing      */
     /* the delete on the shared memory segment ID.                   */
-
+	/*
     rc = semctl( semid, 1, IPC_RMID );
     if (rc==-1)
       {
@@ -168,5 +180,6 @@ int main(int argc, char *argv[])
         printf("main: shmctl() failed\n");
         return -1;
       }
+      */
 return 0;
 }
