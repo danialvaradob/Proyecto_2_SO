@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
       }
 
     printf("About to write on file\n");
-    strcpy((char *) shm_address, "Hello from Client")
+    strcpy((char *) shm_address, "Hello from Client");
     
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */

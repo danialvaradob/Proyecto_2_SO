@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
       }
 
 
-     if (cmp) {
+     if (cmp == 0) {
       printf("Compare result enters!\n");
         rc = semctl( semid, 1, IPC_RMID );
         if (rc==-1)
