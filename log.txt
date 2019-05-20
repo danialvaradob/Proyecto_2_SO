@@ -1,54 +1,18 @@
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:29:18 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:29:54 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 17:31:23 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 17:32:38 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 17:34:17 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:34:26 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:34:52 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 17:36:21 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 17:37:36 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 17:39:15 2019
-Process/thread created with 1 lines and 26 s of execution time on Sat May 18 17:40:45 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:42:03 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 17:43:32 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 17:44:47 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 17:46:26 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:46:48 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 17:47:36 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 17:49:05 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 17:50:20 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 17:51:59 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 20:43:48 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 20:46:46 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 20:48:15 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 20:49:30 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 20:51:09 2019
-Process/thread created with 1 lines and 26 s of execution time on Sat May 18 20:52:39 2019
-Process/thread created with 7 lines and 34 s of execution time on Sat May 18 20:54:05 2019
-Process/thread created with 3 lines and 33 s of execution time on Sat May 18 20:55:39 2019
-Process/thread created with 9 lines and 40 s of execution time on Sat May 18 20:56:53 2019
-Process/thread created with 3 lines and 25 s of execution time on Sat May 18 20:58:31 2019
-Process/thread created with 4 lines and 49 s of execution time on Sat May 18 20:59:28 2019
-Process/thread created with 10 lines and 56 s of execution time on Sat May 18 21:01:17 2019
-Process/thread created with 9 lines and 40 s of execution time on Sat May 18 21:02:48 2019
-Process/thread created with 4 lines and 47 s of execution time on Sat May 18 21:04:20 2019
-Process/thread created with 3 lines and 25 s of execution time on Sat May 18 21:05:38 2019
-Process/thread created with 2 lines and 42 s of execution time on Sat May 18 21:07:03 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:08:51 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 21:10:20 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 21:11:36 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:12:51 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:13:21 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 21:14:50 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:16:31 2019
-Process/thread created with 6 lines and 27 s of execution time on Sat May 18 21:18:00 2019
-Process/thread created with 7 lines and 52 s of execution time on Sat May 18 21:19:15 2019
-Process/thread created with 2 lines and 47 s of execution time on Sat May 18 21:20:54 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:37:22 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:37:32 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:39:30 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:40:01 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:42:26 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:43:20 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:43:45 2019
-Process/thread created with 4 lines and 56 s of execution time on Sat May 18 21:43:52 2019
+
+Process/thread created with 4 lines and 56 s of execution time on Sun May 19 14:03:27 2019
+The memory segment from addresses 0 to 4 was allocated to the process/thread 12932 on Sun May 19 14:04:23 2019
+The process 12932 freed the memory segment from addresses 0 to 4 on Sun May 19 14:04:23 2019
+The process 12932 couldn't find space in memory and died on Sun May 19 14:04:23 2019
+Process/thread created with 6 lines and 27 s of execution time on Sun May 19 14:04:56 2019
+The memory segment from addresses 0 to 6 was allocated to the process/thread 12984 on Sun May 19 14:05:23 2019
+The process 12984 freed the memory segment from addresses 0 to 6 on Sun May 19 14:05:23 2019
+The process 12984 couldn't find space in memory and died on Sun May 19 14:05:23 2019
+Process/thread created with 7 lines and 52 s of execution time on Sun May 19 14:06:11 2019
+The memory segment from addresses 0 to 7 was allocated to the process/thread 13025 on Sun May 19 14:07:03 2019
+The process 13025 freed the memory segment from addresses 0 to 7 on Sun May 19 14:07:03 2019
+The process 13025 couldn't find space in memory and died on Sun May 19 14:07:03 2019
+Process/thread created with 2 lines and 47 s of execution time on Sun May 19 14:07:50 2019
+The memory segment from addresses 0 to 2 was allocated to the process/thread 13086 on Sun May 19 14:08:37 2019
+The process 13086 freed the memory segment from addresses 0 to 2 on Sun May 19 14:08:37 2019
+The process 13086 couldn't find space in memory and died on Sun May 19 14:08:37 2019
+----- Execution ended on Mon May 20 14:36:05 2019 -----
