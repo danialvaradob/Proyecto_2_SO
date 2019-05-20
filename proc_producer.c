@@ -6,6 +6,7 @@
 #include <time.h>
 #include <assert.h>
 #include <sys/syscall.h>
+#include <string.h>
 
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
@@ -24,9 +25,80 @@ struct processInfo {
     enum ProcessState state;   /* The current state of the process */
 };
 
-void* allocate_memory(){
+/* The parameter type specifies the type of message:
+      1: Successfull allocation
+      2: The process couldn't find space in memory
+      3: The process frees a memory segment*/
+void write_to_log(char* msg, struct processInfo *args, int type){
+  FILE *fp;
+  char* filename = "log.txt";
+  /*Waiting for the semaphore*/
+  sem_wait(&mutex);
+  /*Reading file and creating maze */
+  fp = fopen(filename, "a");
+  if (fp == NULL){
+      printf("Could not open file %s",filename);
+  }
+  /*Getting the datetime for the log entry*/
+  time_t t = time(NULL);
+  struct tm *tm = localtime(&t);
+  char s[64];
+  assert(strftime(s, sizeof(s), "%c", tm));
+
+  if (type == 1){
+    fprintf(fp,
+      msg,
+      args->base_register,
+      args->base_register + args->size,
+      syscall(SYS_gettid),
+      s);
+    fflush(fp);
+  }else if (type == 2){
+    fprintf(fp,
+      msg,
+      syscall(SYS_gettid),
+      s);
+    fflush(fp);
+  }else if (type == 3){
+    fprintf(fp,
+      msg,
+      syscall(SYS_gettid),
+      args->base_register,
+      args->base_register + args->size,
+      s);
+    fflush(fp);
+  }
+
+  fclose(fp);
+
+  /*Releasing the semaphore*/
+  sem_post(&mutex);
+}
+
+
+void* allocate_memory(void* pInfo){
+  struct processInfo *args = (struct processInfo *)pInfo;
+  printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
+  printf("I am going to sleep now \n");
+  for (int i = 0; i<args->execution_time;i++){
+    printf(".");//("%d",args->size);
+    fflush(stdout);
+    sleep(1);
+  }
+  printf("\nI'm wide awake now. Bye \n");
+
   if (selected_algorithm == BEST){
+    char* msg = "Test ";
     printf("Algoritmo Best-fit\n\n");
+
+    //if the thread finds space in memory
+    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+
+    //if the thread releases its assigned memory segment
+    write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
+
+    //if the thread doesn't find s
+    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
   }else if (selected_algorithm == FIRST){
     printf("Algoritmo First-fit\n\n");
   }else if (selected_algorithm == WORST){
@@ -34,7 +106,6 @@ void* allocate_memory(){
   }
 
 }
-
 
 void* print_process_state(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
@@ -102,8 +173,6 @@ int main(){
 
     selected_algorithm = algorithmNumber;
 
-    allocate_memory();
-
 
     while (1){
       proc_size = rand() % 10 + 1;
@@ -111,7 +180,7 @@ int main(){
 
       pthread_t PID;// = pthread_self();
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
-      pthread_create(&PID, NULL, print_process_state, &pinfo);
+      pthread_create(&PID, NULL, allocate_memory, &pinfo);
       write_log(exec_time, proc_size);
       pthread_join(PID, NULL);
 
