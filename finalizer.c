@@ -27,6 +27,7 @@ struct processInfo {
 
 
 int main(){
+    sem_init(&mutex, 0, 1);
     FILE *fp;
     char* filename = "log.txt";
     /*Waiting for the semaphore*/
@@ -41,9 +42,9 @@ int main(){
     struct tm *tm = localtime(&t);
     char s[64];
     assert(strftime(s, sizeof(s), "%c", tm));
+
     fprintf(fp,
-      "----- Execution ended on %s-----",
-      proc_size, exec_time, s);
+      "----- Execution ended on %s -----", s);
     fflush(fp);
     fclose(fp);
 
