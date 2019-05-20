@@ -46,12 +46,11 @@ int main(int argc, char *argv[])
     /* semaphores in the set is two.  If a semaphore set already     */
     /* exists for the key, return an error. The specified permissions*/
     /* give everyone read/write access to the semaphore set.         */
-
-    
-	semid = semget( semkey, NUMSEMS, 0666 | IPC_CREAT | IPC_EXCL );
+      
+    semid = semget( semkey, NUMSEMS, 0666 | IPC_CREAT | IPC_EXCL );
     if ( semid == -1 )
       {
-        printf("main1: semget() failed\n");
+        printf("main 1: semget() failed\n");
         return -1;
       }
 
@@ -132,42 +131,18 @@ int main(int argc, char *argv[])
         return -1;
      }
 
-     int cmp = strcmp((char *) shm_address, "Hello from Client");
-
-     if (cmp) {
-		rc = semctl( semid, 1, IPC_RMID );
-	    if (rc==-1)
-	      {
-	        printf("main: semctl() remove id failed\n");
-	        return -1;
-	      }
-	    rc = shmdt(shm_address);
-	    if (rc==-1)
-	      {
-	        printf("main: shmdt() failed\n");
-	        return -1;
-	      }
-	    rc = shmctl(shmid, IPC_RMID, &shmid_struct);
-	    if (rc==-1)
-	      {
-	        printf("main: shmctl() failed\n");
-	        return -1;
-	      }
-
-     }
-
-
-
-    /* Clean up the environment by removing the semid structure,     */
+     /* Clean up the environment by removing the semid structure,     */
     /* detaching the shared memory segment, and then performing      */
     /* the delete on the shared memory segment ID.                   */
-	/*
+
     rc = semctl( semid, 1, IPC_RMID );
     if (rc==-1)
       {
         printf("main: semctl() remove id failed\n");
         return -1;
       }
+
+     /* Detach the shared memory segment from the current process.    */
     rc = shmdt(shm_address);
     if (rc==-1)
       {
@@ -180,6 +155,8 @@ int main(int argc, char *argv[])
         printf("main: shmctl() failed\n");
         return -1;
       }
-      */
+
+
+
 return 0;
 }
