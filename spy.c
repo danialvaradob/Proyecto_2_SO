@@ -1,17 +1,3 @@
-/*********************************************************************/
-/*********************************************************************/
-/*                                                                   */
-/* FUNCTION:  This program acts as a client to the server program.   */
-/*                                                                   */
-/* LANGUAGE:  ILE C                                                  */
-/*                                                                   */
-/* APIs USED: semget(), semop(),                                     */
-/*            shmget(), shmat(), shmdt()                             */
-/*            ftok()                                                 */
-/*                                                                   */
-/*********************************************************************/
-/*********************************************************************/
-
 #include <stdio.h>
 #include <string.h>
 #include <sys/ipc.h>
@@ -23,8 +9,11 @@
 #define SHMKEYPATH "/dev/null"  /* Path used on ftok for shmget key  */
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
-#define NUMSEMS 2
-#define SIZEOFSHMSEG 50
+#define NUMSEMS 1               /* Num of sems in created sem set    */
+#define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
+
+#define NUMMSG 2                /* Server only doing two "receives"
+                                   on shm segment                    */
 
 int main(int argc, char *argv[])
 {
@@ -32,6 +21,7 @@ int main(int argc, char *argv[])
     void         *shm_address;
     int semid, shmid, rc;
     key_t semkey, shmkey;
+    struct shmid_ds shmid_struct;
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -79,9 +69,9 @@ int main(int argc, char *argv[])
       }
 
     /* Check if the second semaphore is 0. If its no, the the spy    */
-    /* process i allowed to read the shared memory					 */
+    /* process i allowed to read the shared memory                   */
     /* for the semaphore to reach zero before running the semop().   */
-	operations[0].sem_num = 0;
+    operations[0].sem_num = 0;
                                     /* Operate on the first sem      */
     operations[0].sem_op =  0;
                                     /* Wait for the value to be=0    */
@@ -102,8 +92,9 @@ int main(int argc, char *argv[])
         return -1;
       }
 
-    strcpy((char *) shm_address, "Hello from Client");
-
+    printf("About to write on file\n");
+    strcpy((char *) shm_address, "Hello from Client")
+    
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */
     /* show that the client is finished with it.                     */
@@ -122,10 +113,13 @@ int main(int argc, char *argv[])
         return -1;
       }
 
+
+    //printf("About to write on file\n");
+    //strcpy((char *) shm_address, "Hello from Client");
+
     /* Detach the shared memory segment from the current process.    */
     rc = shmdt(shm_address);
-    if (rc==-1)
-      {
+    if (rc==-1) {
         printf("main: shmdt() failed\n");
         return -1;
       }

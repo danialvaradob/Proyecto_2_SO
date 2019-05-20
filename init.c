@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
     /* Set the first semaphore to equal -1, which means          */
     /* that the shared memory segment is free.                   */
     sem_buf.sem_num = 0;
-    sem_buf.sem_op =  -1;
-    sem_buf.sem_flg = SEM_UNDO;
+    sem_buf.sem_op =  0;
+    sem_buf.sem_flg = IPC_NOWAIT;
     //operations[0].sem_flg = 0;
 
     retval = semop(semid, &sem_buf, 1 );

@@ -23,6 +23,7 @@ int main(int argc, char *argv[])
     void         *shm_address;
     int semid, shmid, rc;
     key_t semkey, shmkey;
+    struct shmid_ds shmid_struct;
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -115,12 +116,9 @@ int main(int argc, char *argv[])
         return -1;
       }
 
-    
-      
-
-    
 
      if (cmp) {
+      printf("Compare result enters!\n");
         rc = semctl( semid, 1, IPC_RMID );
         if (rc==-1)
           {
