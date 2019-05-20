@@ -149,8 +149,8 @@ void write_log(int exec_time, int proc_size){
 
     /*Releasing the semaphore*/
     sem_post(&mutex);
-
 }
+
 int main(){
     int proc_size, exec_time, producer_wait;
     sem_init(&mutex, 0, 1);
@@ -159,6 +159,7 @@ int main(){
 
     enum AlgorithmType algorithmNumber;
 
+    /* Cycle for validating user's input */
     while (1){
       printf(" 1) Best-fit \n 2) First-fit \n 3) Worst-fit \n");
       printf("Select the algorithm: ");
@@ -173,7 +174,7 @@ int main(){
 
     selected_algorithm = algorithmNumber;
 
-
+    /* Cycle for creating the threads */
     while (1){
       proc_size = rand() % 10 + 1;
       exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
