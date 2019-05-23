@@ -78,11 +78,7 @@ int main(int argc, char *argv[])
     printf("Ready for client jobs\n");
 
     
-    /* Set the structure passed into the semop() to first wait   */
-    /* for the second semval to equal 1, then decrement it to    */
-    /* allow the next signal that the client writes to it.       */
-    /* Set the first semaphore to equal -1, which means          */
-    /* that the shared memory segment is free.                   */
+    /*Set the shared memory segment for use using the semaphore.     */
     sem_buf.sem_num = 0;
     sem_buf.sem_op =  0;
     sem_buf.sem_flg = IPC_NOWAIT;

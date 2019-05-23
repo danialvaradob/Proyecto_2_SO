@@ -151,6 +151,28 @@ void write_log(int exec_time, int proc_size){
     sem_post(&mutex);
 }
 
+
+void connect_shared_memory() {
+  struct sembuf operations[2];
+  void          *shm_address;
+  int           semId,shmId, retval;
+  key_t         semKey, shmKey;
+
+  /* Generate the IPC key for the semaphore and memory segment */
+    semKey = ftok(SEMKEYPATH,SEMKEYID);
+    if ( semkey == (key_t)-1 )
+      {
+        printf("main: ftok() for sem failed\n");
+        return -1;
+      }
+    shmKey = ftok(SHMKEYPATH,SHMKEYID);
+    if ( shmKey == (key_t)-1 )
+      {
+        printf("main: ftok() for shm failed\n");
+        return -1;
+      }
+}
+
 int main(){
     int proc_size, exec_time, producer_wait;
     sem_init(&mutex, 0, 1);

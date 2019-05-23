@@ -27,14 +27,12 @@ int main(int argc, char *argv[])
     /* memory segment.  Typically, an application specific path and  */
     /* id would be used to generate the IPC key.                     */
     semkey = ftok(SEMKEYPATH,SEMKEYID);
-    if ( semkey == (key_t)-1 )
-      {
+    if ( semkey == (key_t)-1 ) {
         printf("main: ftok() for sem failed\n");
         return -1;
       }
     shmkey = ftok(SHMKEYPATH,SHMKEYID);
-    if ( shmkey == (key_t)-1 )
-      {
+    if ( shmkey == (key_t)-1 ) {
         printf("main: ftok() for shm failed\n");
         return -1;
       }
@@ -43,8 +41,7 @@ int main(int argc, char *argv[])
     /* If the semaphore set does not exist, then it will not be      */
     /* created, and an error will occur.                             */
     semid = semget( semkey, NUMSEMS, 0666);
-    if ( semid == -1 )
-      {
+    if ( semid == -1 ) {
         printf("main: semget() failed\n");
         return -1;
       }
@@ -54,16 +51,14 @@ int main(int argc, char *argv[])
     /* created, and an error will occur.                             */
 
     shmid = shmget(shmkey, SIZEOFSHMSEG, 0666);
-    if (shmid == -1)
-      {
+    if (shmid == -1) {
         printf("main: shmget() failed\n");
         return -1;
       }
 
+
     /* Attach the shared memory segment to the client process.       */
-    shm_address = shmat(shmid, NULL, 0);
-    if ( shm_address==NULL )
-      {
+    shm_address = shmat(shmid, NULL, 0); {
         printf("main: shmat() failed\n");
         return -1;
       }
@@ -86,14 +81,13 @@ int main(int argc, char *argv[])
                                     /* Allow a wait to occur         */
 
     rc = semop( semid, operations, 2 );
-    if (rc == -1)
-      {
+    if (rc == -1) {
         printf("main: semop() failed\n");
         return -1;
       }
 
     printf("About to write on file\n");
-    strcpy((char *) shm_address, "Hello from Client");
+    strcpy((char *) shm_address, "Hello from Client"); 
     
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */
@@ -107,8 +101,7 @@ int main(int argc, char *argv[])
 
 
     rc = semop( semid, operations, 1 );
-    if (rc == -1)
-      {
+    if (rc == -1) {
         printf("main: semop() failed\n");
         return -1;
       }
