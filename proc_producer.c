@@ -8,6 +8,18 @@
 #include <sys/syscall.h>
 #include <string.h>
 
+#define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
+#define SEMKEYID 1              /* Id used on ftok for semget key    */
+#define SHMKEYPATH "/dev/null"  /* Path used on ftok for shmget key  */
+#define SHMKEYID 1              /* Id used on ftok for shmget key    */
+
+#define NUMSEMS 1               /* Num of sems in created sem set    */
+#define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
+
+#define NUMMSG 2                /* Server only doing two "receives"
+                                   on shm segment                    */
+
+
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
 enum ProcessState{RUNNING, BLOCKED, IN_CRITICAL_REGION};
@@ -159,18 +171,27 @@ void connect_shared_memory() {
   key_t         semKey, shmKey;
 
   /* Generate the IPC key for the semaphore and memory segment */
-    semKey = ftok(SEMKEYPATH,SEMKEYID);
-    if ( semkey == (key_t)-1 )
-      {
-        printf("main: ftok() for sem failed\n");
-        return -1;
-      }
-    shmKey = ftok(SHMKEYPATH,SHMKEYID);
-    if ( shmKey == (key_t)-1 )
-      {
-        printf("main: ftok() for shm failed\n");
-        return -1;
-      }
+  semKey = ftok(SEMKEYPATH,SEMKEYID);
+  if ( semkey == (key_t)-1 ) {
+    printf("main: ftok() for sem failed\n");
+    return -1;
+  }
+
+  shmKey = ftok(SHMKEYPATH,SHMKEYID);
+  if ( shmKey == (key_t)-1 ) {
+    printf("main: ftok() for shm failed\n");
+    return -1;
+  }
+
+  /* Get the created shared memory ID associated with the key */
+  semId = shmget(shmKey, SIZEOFSHMSEG, 0666);
+  if (semId == -1) {
+    printf("main: shmget() failed\n");
+    return -1;
+  }
+
+
+
 }
 
 int main(){
