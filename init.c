@@ -12,7 +12,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 100       /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
         return -1;
     }   
     /* Attach the shared memory segment to the server process.       */
-    shm_address = shmat(shmid, NULL, 0);
+    shm_address = (char*)shmat(shmid, NULL, 0);
     if ( shm_address== (char *) -1 ) {
         printf("main: shmat() failed\n");
         return -1;

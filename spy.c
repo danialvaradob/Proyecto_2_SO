@@ -10,7 +10,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 100       /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -18,10 +18,11 @@
 int main(int argc, char *argv[])
 {
     struct sembuf operations[2];
-    void         *shm_address;
+    char         *shm_address;
     int semid, shmid, rc;
     key_t semkey, shmkey;
     struct shmid_ds shmid_struct;
+    int segment_size;
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -58,11 +59,16 @@ int main(int argc, char *argv[])
 
 
     /* Attach the shared memory segment to the client process.       */
-    shm_address = shmat(shmid, NULL, 0); 
+    shm_address = (char*)shmat(shmid, NULL, 0);
     if (shm_address == NULL) {
         printf("main: shmat() failed\n");
         return -1;
       }
+
+    
+    //size_t len = strlen(shm_address);
+    //printf("%zu", len);
+
 
     /* Check if the second semaphore is 0. If its no, the the spy    */
     /* process i allowed to read the shared memory                   */
@@ -89,6 +95,11 @@ int main(int argc, char *argv[])
 
     printf("About to write on file\n");
     strcpy((char *) shm_address, "Hello from Client"); 
+
+    //shmctl (shmid, IPC_STAT, &shmid_struct);
+    //segment_size  = shmid_struct.shm_segsz;
+    //printf ("segment size: %d\n", segment_size);
+
 
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */

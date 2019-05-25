@@ -14,7 +14,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 100       /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -195,9 +195,12 @@ void connect_shared_memory() {
     printf("main: shmget() failed\n");
     return -1;
   }
- char* buf = (char*)shmat(shmid,NULL,0);
- size_t len = strlen(&buf);
- printf("%zu", len);
+ 
+ /* Memory segmente  */
+ shm_address = (char*)shmat(shmid, NULL, 0);
+
+
+ 
 
 
 }
