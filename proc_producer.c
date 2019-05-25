@@ -183,13 +183,19 @@ void connect_shared_memory() {
     return -1;
   }
 
+  semid = semget( semkey, NUMSEMS, 0666);
+  if ( semid == -1 ) {
+      printf("main: semget() failed\n");
+      return -1;
+  }
+
   /* Get the created shared memory ID associated with the key */
-  semId = shmget(shmKey, SIZEOFSHMSEG, 0666);
+  shmId = shmget(shmKey, SIZEOFSHMSEG, 0666);
   if (semId == -1) {
     printf("main: shmget() failed\n");
     return -1;
   }
-
+ char* buf = (char*)shmat(shmid,NULL,0);
 
 
 }
