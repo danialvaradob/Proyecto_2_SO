@@ -12,7 +12,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 100       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         printf("main: shmat() failed\n");
         return -1;
     }
-    printf("Ready for client jobs\n");
+    printf("Initializer DONE\n");
 
     
     /*Set the shared memory segment for use using the semaphore.     */

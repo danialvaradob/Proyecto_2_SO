@@ -10,7 +10,7 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 100        /* Size of the shared mem segment    */
+#define SIZEOFSHMSEG 100       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -54,11 +54,12 @@ int main(int argc, char *argv[])
     if (shmid == -1) {
         printf("main: shmget() failed\n");
         return -1;
-      }
+    }
 
 
     /* Attach the shared memory segment to the client process.       */
-    shm_address = shmat(shmid, NULL, 0); {
+    shm_address = shmat(shmid, NULL, 0); 
+    if (shm_address == NULL) {
         printf("main: shmat() failed\n");
         return -1;
       }
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 
     printf("About to write on file\n");
     strcpy((char *) shm_address, "Hello from Client"); 
-    
+
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */
     /* show that the client is finished with it.                     */
