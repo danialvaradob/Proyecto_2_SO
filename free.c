@@ -20,7 +20,7 @@
 int main(int argc, char *argv[])
 {
     struct sembuf operations[2];
-    void         *shm_address;
+    char         *shm_address;
     int semid, shmid, rc;
     key_t semkey, shmkey;
     struct shmid_ds shmid_struct;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
       }
 
     /* Attach the shared memory segment to the client process.       */
-    shm_address = shmat(shmid, NULL, 0);
+    shm_address = (char*)shmat(shmid, NULL, 0);
     if ( shm_address==NULL )
       {
         printf("main: shmat() failed\n");
@@ -95,8 +95,10 @@ int main(int argc, char *argv[])
       }
 
 
-    int cmp = strcmp((char *) shm_address, "Hello from Client");
-    printf("Compare result: %d\n", cmp);
+
+
+    //int cmp = strcmp(shm_address, "Hello from Client");
+    printf("%s \n",shm_address );
 
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
       }
 
 
-     if (cmp == 0) {
+     if (1) {
       printf("Compare result enters!\n");
         rc = semctl( semid, 1, IPC_RMID );
         if (rc==-1)

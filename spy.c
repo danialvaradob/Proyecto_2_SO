@@ -93,12 +93,9 @@ int main(int argc, char *argv[])
         return -1;
       }
 
-    printf("About to write on file\n");
-    strcpy((char *) shm_address, "Hello from Client"); 
+    char* pointer = shm_address + 3;
+    strcpy(pointer,"ABCDEFG");
 
-    //shmctl (shmid, IPC_STAT, &shmid_struct);
-    //segment_size  = shmid_struct.shm_segsz;
-    //printf ("segment size: %d\n", segment_size);
 
 
     /* Release the shared memory segment by decrementing the in-use  */

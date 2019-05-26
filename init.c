@@ -21,10 +21,11 @@ int main(int argc, char *argv[])
 {
     int retval, semid, shmid, i;
     key_t semkey, shmkey;
-    void *shm_address;
+    
     struct sembuf sem_buf;
     struct shmid_ds shmid_struct;
     short  sarray[NUMSEMS];
+    char *s,  *shm_address;
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -75,6 +76,11 @@ int main(int argc, char *argv[])
         printf("main: shmat() failed\n");
         return -1;
     }
+
+    s = shm_address;                          
+    for (int i = 0; i <= SIZEOFSHMSEG; i++)           
+        *s = ' ';
+             
     printf("Initializer DONE\n");
 
     
