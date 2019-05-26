@@ -77,9 +77,13 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+
+    //Memory filled with spaces
     s = shm_address;                          
-    for (int i = 0; i <= SIZEOFSHMSEG; i++)           
+    for (int i = 0; i <= SIZEOFSHMSEG; i++) {          
         *s = ' ';
+        s++;
+    }
              
     printf("Initializer DONE\n");
 
@@ -88,7 +92,6 @@ int main(int argc, char *argv[])
     sem_buf.sem_num = 0;
     sem_buf.sem_op =  0;
     sem_buf.sem_flg = IPC_NOWAIT;
-    //operations[0].sem_flg = 0;
 
     retval = semop(semid, &sem_buf, 1 );
     if (retval == -1) {

@@ -18,11 +18,12 @@
 int main(int argc, char *argv[])
 {
     struct sembuf operations[2];
-    char         *shm_address;
+    char         *shm_address, *pointer;
     int semid, shmid, rc;
     key_t semkey, shmkey;
     struct shmid_ds shmid_struct;
     int segment_size;
+
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -66,9 +67,6 @@ int main(int argc, char *argv[])
       }
 
     
-    //size_t len = strlen(shm_address);
-    //printf("%zu", len);
-
 
     /* Check if the second semaphore is 0. If its no, the the spy    */
     /* process i allowed to read the shared memory                   */
@@ -93,10 +91,16 @@ int main(int argc, char *argv[])
         return -1;
       }
 
-    char* pointer = shm_address + 3;
-    strcpy(pointer,"ABCDEFG");
+    /*
+    pointer = shm_address + 3;
+    for (char A ='A'; A < 'G'; A++) {
+        *pointer = A;
+        pointer++;
+    }
+    
+    */
 
-
+    printf("%s \n",shm_address );
 
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */
@@ -116,15 +120,14 @@ int main(int argc, char *argv[])
       }
 
 
-    //printf("About to write on file\n");
-    //strcpy((char *) shm_address, "Hello from Client");
+
 
     /* Detach the shared memory segment from the current process.    */
     rc = shmdt(shm_address);
     if (rc==-1) {
         printf("main: shmdt() failed\n");
         return -1;
-      }
+    }
 
 return 0;
 }
