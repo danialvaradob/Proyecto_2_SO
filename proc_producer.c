@@ -7,6 +7,9 @@
 #include <assert.h>
 #include <sys/syscall.h>
 #include <string.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
+#include <sys/shm.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -164,21 +167,21 @@ void write_log(int exec_time, int proc_size){
 }
 
 
-void connect_shared_memory() {
+int connect_shared_memory() {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
-  int           semId,shmId, retval;
-  key_t         semKey, shmKey;
+  int           semid,shmid, retval;
+  key_t         semkey, shmkey;
 
   /* Generate the IPC key for the semaphore and memory segment */
-  semKey = ftok(SEMKEYPATH,SEMKEYID);
+  semkey = ftok(SEMKEYPATH,SEMKEYID);
   if ( semkey == (key_t)-1 ) {
     printf("main: ftok() for sem failed\n");
     return -1;
   }
 
-  shmKey = ftok(SHMKEYPATH,SHMKEYID);
-  if ( shmKey == (key_t)-1 ) {
+  shmkey = ftok(SHMKEYPATH,SHMKEYID);
+  if ( shmkey == (key_t)-1 ) {
     printf("main: ftok() for shm failed\n");
     return -1;
   }
@@ -190,8 +193,8 @@ void connect_shared_memory() {
   }
 
   /* Get the created shared memory ID associated with the key */
-  shmId = shmget(shmKey, SIZEOFSHMSEG, 0666);
-  if (semId == -1) {
+  shmid = shmget(shmkey, SIZEOFSHMSEG, 0666);
+  if (semid == -1) {
     printf("main: shmget() failed\n");
     return -1;
   }
@@ -199,66 +202,62 @@ void connect_shared_memory() {
  /* Memory segmente  */
  shm_address = (char*)shmat(shmid, NULL, 0);
  /* Check if the second semaphore is 0. If its no, the the spy    */
-/* process i allowed to read the shared memory                   */
-/* for the semaphore to reach zero before running the semop().   */
-operations[0].sem_num = 0;
-                                    /* Operate on the first sem      */
-operations[0].sem_op =  0;
-                                    /* Wait for the value to be=0    */
-operations[0].sem_flg = 0;
-                                    /* Allow a wait to occur         */
+  /* process i allowed to read the shared memory                   */
+  /* for the semaphore to reach zero before running the semop().   */
+  operations[0].sem_num = 0;
+                                      /* Operate on the first sem      */
+  operations[0].sem_op =  0;
+                                      /* Wait for the value to be=0    */
+  operations[0].sem_flg = 0;
+                                      /* Allow a wait to occur         */
 
-operations[1].sem_num = 0;
-                                    /* Operate on the first sem      */
-operations[1].sem_op =  1;
-                                    /* Increment the semval by one   */
-operations[1].sem_flg = 0;
-                                    /* Allow a wait to occur         */
+  operations[1].sem_num = 0;
+                                      /* Operate on the first sem      */
+  operations[1].sem_op =  1;
+                                      /* Increment the semval by one   */
+  operations[1].sem_flg = 0;
+                                      /* Allow a wait to occur         */
 
-retval = semop( semid, operations, 2 );
-if (retval == -1) {
-  printf("main: semop() failed\n");
-  return -1;
-}
+  retval = semop( semid, operations, 2 );
+  if (retval == -1) {
+    printf("main: semop() failed\n");
+    return -1;
+  }
 
-/*  Used by threads       */
-pointer = shm_address + 3;
-for (char A ='A'; A < 'G'; A++) {
-  *pointer = A;
-  pointer++;
-}
-
-
-/* Release the shared memory segment by decrementing the in-use  */
-/* semaphore (the first one).  Increment the second semaphore to */
-/* show that the client is finished with it.                     */
-operations[0].sem_num = 0;
-                                    /* Operate on the first sem      */
-operations[0].sem_op =  -1;
-                                    /* Decrement the semval by one   */
-operations[0].sem_flg = 0;
-                                    /* Allow a wait to occur         */
+  /*  Used by threads       */
+  pointer = shm_address + 3;
+  for (char A ='A'; A < 'G'; A++) {
+    *pointer = A;
+    pointer++;
+  }
 
 
-retval = semop( semid, operations, 1 );
-if (retval == -1) {
-  printf("main: semop() failed\n");
-  return -1;
-}
+  /* Release the shared memory segment by decrementing the in-use  */
+  /* semaphore (the first one).  Increment the second semaphore to */
+  /* show that the client is finished with it.                     */
+  operations[0].sem_num = 0;
+                                      /* Operate on the first sem      */
+  operations[0].sem_op =  -1;
+                                      /* Decrement the semval by one   */
+  operations[0].sem_flg = 0;
+                                      /* Allow a wait to occur         */
+
+
+  retval = semop( semid, operations, 1 );
+  if (retval == -1) {
+    printf("main: semop() failed\n");
+    return -1;
+  }
 
 
 
 
-/* Detach the shared memory segment from the current process.    */
-retval = shmdt(shm_address);
-if (retval==-1) {
-  printf("main: shmdt() failed\n");
-  return -1;
-}
-
-
- 
-
+  /* Detach the shared memory segment from the current process.    */
+  retval = shmdt(shm_address);
+  if (retval==-1) {
+    printf("main: shmdt() failed\n");
+    return -1;
+  }
 
 }
 
