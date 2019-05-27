@@ -26,6 +26,120 @@ struct processInfo {
 };
 
 
+
+void releaseMemory() {
+    struct sembuf operations[2];
+    char         *shm_address;
+    int semid, shmid, rc;
+    key_t semkey, shmkey;
+    struct shmid_ds shmid_struct;
+
+    /* Generate an IPC key for the semaphore set and the shared      */
+    /* memory segment.  Typically, an application specific path and  */
+    /* id would be used to generate the IPC key.                     */
+    semkey = ftok(SEMKEYPATH,SEMKEYID);
+    if ( semkey == (key_t)-1 )
+      {
+        printf("main: ftok() for sem failed\n");
+        return -1;
+      }
+    shmkey = ftok(SHMKEYPATH,SHMKEYID);
+    if ( shmkey == (key_t)-1 )
+      {
+        printf("main: ftok() for shm failed\n");
+        return -1;
+      }
+
+    /* Get the already created semaphore ID associated with key.     */
+    /* If the semaphore set does not exist, then it will not be      */
+    /* created, and an error will occur.                             */
+    semid = semget( semkey, NUMSEMS, 0666);
+    if ( semid == -1 )
+      {
+        printf("main: semget() failed\n");
+        return -1;
+      }
+
+    /* Get the already created shared memory ID associated with key. */
+    /* If the shared memory ID does not exist, then it will not be   */
+    /* created, and an error will occur.                             */
+
+    shmid = shmget(shmkey, SIZEOFSHMSEG, 0666);
+    if (shmid == -1)
+      {
+        printf("main: shmget() failed\n");
+        return -1;
+      }
+
+    /* Attach the shared memory segment to the client process.       */
+    shm_address = (char*) shmat(shmid, NULL, 0);
+    if ( shm_address==NULL )
+      {
+        printf("main: shmat() failed\n");
+        return -1;
+      }
+
+    /* Check if the second semaphore is 0. If its no, the the spy    */
+    /* process i allowed to read the shared memory                   */
+    /* for the semaphore to reach zero before running the semop().   */
+    operations[0].sem_num = 0;
+    operations[0].sem_op =  0;
+    operations[0].sem_flg = 0;
+    
+    operations[1].sem_num = 0;
+    operations[1].sem_op =  1;
+    operations[1].sem_flg = 0;
+
+    rc = semop( semid, operations, 2 );
+    if (rc == -1)
+      {
+        printf("main: semop() failed\n");
+        return -1;
+      }
+
+    /* Release the shared memory segment by decrementing the in-use  */
+    /* semaphore (the first one).  Increment the second semaphore to */
+    /* show that the client is finished with it.                     */
+    operations[0].sem_num = 0;
+    operations[0].sem_op =  -1;
+    operations[0].sem_flg = 0;
+                                    
+
+
+    rc = semop( semid, operations, 1 );
+    if (rc == -1)
+      {
+        printf("main: semop() failed\n");
+        return -1;
+      }
+
+
+     if (1) {
+      printf("Finalizing processes. Freeing memory.  \n");
+        rc = semctl( semid, 1, IPC_RMID );
+        if (rc==-1)
+          {
+            printf("main: semctl() remove id failed\n");
+            return -1;
+          }
+        rc = shmdt(shm_address);
+        if (rc==-1)
+          {
+            printf("main: shmdt() failed\n");
+            return -1;
+          }
+        rc = shmctl(shmid, IPC_RMID, &shmid_struct);
+        if (rc==-1)
+          {
+            printf("main: shmctl() failed\n");
+            return -1;
+          }
+
+     }
+
+
+}
+
 int main(){
     sem_init(&mutex, 0, 1);
     FILE *fp;
@@ -50,6 +164,10 @@ int main(){
 
     /*Releasing the semaphore*/
     sem_post(&mutex);
+
+    /* Releasing memory segment */
+
+
 
     return 0;
 }
