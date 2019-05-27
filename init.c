@@ -13,16 +13,20 @@
 
 #define LINESIZE 3
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
+//#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
 int main(int argc, char *argv[])
 {
+    int SIZEOFSHMSEG;
+    printf("Enter the size of the memory (in lines): ");
+    scanf("%d",&SIZEOFSHMSEG);
+
     int retval, semid, shmid, i;
     key_t semkey, shmkey;
-    
+
     struct sembuf sem_buf;
     struct shmid_ds shmid_struct;
     short  sarray[NUMSEMS];
@@ -50,7 +54,7 @@ int main(int argc, char *argv[])
     /* semaphores in the set is two.  If a semaphore set already     */
     /* exists for the key, return an error. The specified permissions*/
     /* give everyone read/write access to the semaphore set.         */
-      
+
     semid = semget( semkey, NUMSEMS, 0666 | IPC_CREAT | IPC_EXCL );
     if ( semid == -1 )
       {
@@ -70,7 +74,7 @@ int main(int argc, char *argv[])
     if (shmid == -1) {
         printf("main2: shmget() failed\n");
         return -1;
-    }   
+    }
     /* Attach the shared memory segment to the server process.       */
     shm_address = (char*)shmat(shmid, NULL, 0);
     if ( shm_address== (char *) -1 ) {
@@ -92,10 +96,10 @@ int main(int argc, char *argv[])
         }        
         s++;
     }
-             
+
     printf("Initializer DONE\n");
 
-    
+
     /*Set the shared memory segment for use using the semaphore.     */
     sem_buf.sem_num = 0;
     sem_buf.sem_op =  0;
@@ -105,11 +109,11 @@ int main(int argc, char *argv[])
     if (retval == -1) {
         printf("main1: semop() failed\n");
         return -1;
-    
-    }
-       
 
-    
+    }
+
+
+
      /* Detach the shared memory segment from the current process.    */
     retval = shmdt(shm_address);
     if (retval==-1)
@@ -117,7 +121,7 @@ int main(int argc, char *argv[])
         printf("main: shmdt() failed\n");
         return -1;
       }
-    
+
 
 
 
