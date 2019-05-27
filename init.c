@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     /* give everyone read/write access to the shared memory segment. */
     /* If a shared memory segment already exists for this key,       */
     /* return an error.                                              */
-    shmid = shmget(shmkey, SIZEOFSHMSEG, 0666 | IPC_CREAT | IPC_EXCL);
+    shmid = shmget(shmkey, SIZEOFSHMSEG * LINESIZE, 0666 | IPC_CREAT | IPC_EXCL);
     if (shmid == -1) {
         printf("main2: shmget() failed\n");
         return -1;
