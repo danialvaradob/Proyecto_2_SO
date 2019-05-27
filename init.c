@@ -11,6 +11,7 @@
 #define SHMKEYPATH "/dev/null"  /* Path used on ftok for shmget key  */
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
+#define LINESIZE 3
 #define NUMSEMS 1               /* Num of sems in created sem set    */
 #define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
@@ -79,9 +80,16 @@ int main(int argc, char *argv[])
 
 
     //Memory filled with spaces
-    s = shm_address;                          
-    for (int i = 0; i <= SIZEOFSHMSEG; i++) {          
-        *s = ' ';
+    s = shm_address;
+    int counter = 0;                          
+    for (int i = 0; i <= SIZEOFSHMSEG; i++) {  
+        if (counter == LINESIZE) {
+            *s = '\n';
+            counter = 0;
+        } else {
+            *s = ' ';
+            counter++;    
+        }        
         s++;
     }
              
