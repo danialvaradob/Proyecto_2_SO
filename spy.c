@@ -15,8 +15,9 @@
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
-int main(int argc, char *argv[])
-{
+
+
+int show_memory_state() {
     struct sembuf operations[2];
     char         *shm_address, *pointer;
     int semid, shmid, rc;
@@ -130,4 +131,24 @@ int main(int argc, char *argv[])
     }
 
 return 0;
+
+}
+
+
+int main(int argc, char *argv[]) {
+    int option;
+    while (1) {
+        printf("Welcome to the Spy Process.\nEnter 1 for the memory status\nEnter 2 for the proccesses status\nEnter 3 to exit\nResponse: ");
+        scanf("%d",&option);
+
+        if (option == 1) {
+            show_memory_state();
+        } else if (option == 2) {
+            printf("Process 1\n");
+        } else if (option == 3) {
+            printf("Exiting....\n");
+            break;
+        }
+    }
+    return 0;
 }
