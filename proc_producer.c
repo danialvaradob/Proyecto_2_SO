@@ -106,6 +106,9 @@ void* allocate_memory(void* pInfo){
     char* msg = "Test ";
     printf("Algoritmo Best-fit\n\n");
 
+    //Memory segment
+    connect_shared_memory();
+
     //if the thread finds space in memory
     write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
 
@@ -115,8 +118,16 @@ void* allocate_memory(void* pInfo){
     //if the thread doesn't find s
     write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
   }else if (selected_algorithm == FIRST){
+
+    //Memory segment
+    connect_shared_memory();
+
     printf("Algoritmo First-fit\n\n");
   }else if (selected_algorithm == WORST){
+
+    //Memory segment
+    connect_shared_memory();
+    
     printf("Algoritmo Worst-fit\n\n");
   }
 
@@ -167,6 +178,11 @@ void write_log(int exec_time, int proc_size){
 }
 
 
+
+/*
+Method used to connect to the shared memory segment used throught the procceses.
+IPC 
+*/
 int connect_shared_memory() {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
