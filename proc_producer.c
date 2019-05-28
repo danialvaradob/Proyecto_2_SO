@@ -107,7 +107,7 @@ void* allocate_memory(void* pInfo){
     printf("Algoritmo Best-fit\n\n");
 
     //Memory segment
-    connect_shared_memory();
+    connect_shared_memory(BEST);
 
     //if the thread finds space in memory
     write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
@@ -183,7 +183,7 @@ void write_log(int exec_time, int proc_size){
 Method used to connect to the shared memory segment used throught the procceses.
 IPC 
 */
-int connect_shared_memory() {
+int connect_shared_memory(AlgorithmType _type) {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
   int           semid,shmid, retval;
@@ -240,13 +240,23 @@ int connect_shared_memory() {
     return -1;
   }
 
+
+
   /*  Used by threads       */
+  if (_type == BEST) {
+      pointer = shm_address;
+      for (int i; i < SIZEOFSHMSEG; i++) {
+        
+        pointer++;
+      }
+  }
+  /*
   pointer = shm_address + 3;
   for (char A ='A'; A < 'G'; A++) {
     *pointer = A;
     pointer++;
   }
-
+  */
 
   /* Release the shared memory segment by decrementing the in-use  */
   /* semaphore (the first one).  Increment the second semaphore to */

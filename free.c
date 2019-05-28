@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 
      if (1) {
-      printf("Finalizing processes. Freeing memory.\n");
+      printf("Finalizing processes. Freeing memory.  \n");
         rc = semctl( semid, 1, IPC_RMID );
         if (rc==-1)
           {
