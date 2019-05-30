@@ -19,7 +19,7 @@
 
 int show_memory_state() {
     struct sembuf operations[2];
-    char         *shm_address, *pointer;
+    int         *shm_address, *pointer;
     int semid, shmid, rc;
     key_t semkey, shmkey;
     struct shmid_ds shmid_struct;
@@ -61,7 +61,7 @@ int show_memory_state() {
 
 
     /* Attach the shared memory segment to the client process.       */
-    shm_address = (char*)shmat(shmid, NULL, 0);
+    shm_address = (int *) shmat(shmid, NULL, 0);
     if (shm_address == NULL) {
         printf("main: shmat() failed\n");
         return -1;
@@ -101,7 +101,12 @@ int show_memory_state() {
     
     */
 
-    printf("%s \n",shm_address );
+      for (int i = 0; i < SIZEOFSHMSEG; i++) {
+
+        printf("%d\n",shm_address[i]);
+
+      }
+
 
     /* Release the shared memory segment by decrementing the in-use  */
     /* semaphore (the first one).  Increment the second semaphore to */

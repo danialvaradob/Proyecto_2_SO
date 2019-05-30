@@ -11,7 +11,7 @@
 #define SHMKEYPATH "/dev/null"  /* Path used on ftok for shmget key  */
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
-#define LINESIZE 3
+#define LINESIZE 1
 #define NUMSEMS 1               /* Num of sems in created sem set    */
 //#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
 
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     struct sembuf sem_buf;
     struct shmid_ds shmid_struct;
     short  sarray[NUMSEMS];
-    char *s,  *shm_address;
+    int *s,  *shm_address;
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -76,26 +76,20 @@ int main(int argc, char *argv[])
         return -1;
     }
     /* Attach the shared memory segment to the server process.       */
-    shm_address = (char*)shmat(shmid, NULL, 0);
-    if ( shm_address== (char *) -1 ) {
+    shm_address = (int *) shmat(shmid, 0, 0);
+    if ( shm_address== (int *) -1 ) {
         printf("main: shmat() failed\n");
         return -1;
     }
 
 
-    //Memory filled with spaces
-    s = shm_address;
-    int counter = 0;                          
-    for (int i = 0; i <= SIZEOFSHMSEG; i++) {  
-        if (counter == LINESIZE) {
-            *s = '\n';
-            counter = 0;
-        } else {
-            *s = ' ';
-            counter++;    
-        }        
-        s++;
+    // TEST
+    for (int i = 5; i < (12); i++) {
+        if (i !=10)
+            shm_address[i] = i;
     }
+
+
 
     printf("Initializer DONE\n");
 

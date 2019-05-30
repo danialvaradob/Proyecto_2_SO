@@ -18,6 +18,7 @@
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
 #define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
+#define BLOCKSIZE 10
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
@@ -39,6 +40,52 @@ struct processInfo {
     int           execution_time;/*Amount of time the process is going to sleep*/
     enum ProcessState state;   /* The current state of the process */
 };
+
+
+void first_fit(int *_memory, struct processInfo *args) {
+  int *memory;
+  int size,temp ,memory_size, i = 0, counter = 0, flag = 1;
+  
+  memory = _memory;
+  size = args->size;
+
+  memory_size = SIZEOFSHMSEG;
+
+ while (i < memory_size) {
+    if (memory[i] == 0) {
+        temp = i;
+        flag = 1;
+        for (counter = 0; counter < size; counter++) {
+            if (memory[temp] != 0) {
+                flag = 0;
+            } else {
+                temp++;
+            }
+        }
+    
+    
+        if (flag) {
+            temp = i;
+            for (counter = 0; counter < size; counter++) {
+                memory[temp] =  syscall(SYS_gettid);
+                temp++;
+            }
+            break;
+        } else {
+            i = temp;
+        }
+    }
+    i++;
+ }
+
+}
+
+
+
+void best_fit(int *_memory) {
+
+}
+
 
 /* The parameter type specifies the type of message:
       1: Successfull allocation
@@ -183,7 +230,7 @@ void write_log(int exec_time, int proc_size){
 Method used to connect to the shared memory segment used throught the procceses.
 IPC 
 */
-int connect_shared_memory(AlgorithmType _type) {
+int connect_shared_memory(AlgorithmType _type, struct processInfo *args) {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
   int           semid,shmid, retval;
@@ -243,12 +290,8 @@ int connect_shared_memory(AlgorithmType _type) {
 
 
   /*  Used by threads       */
-  if (_type == BEST) {
-      pointer = shm_address;
-      for (int i; i < SIZEOFSHMSEG; i++) {
-        
-        pointer++;
-      }
+  if (_type == FIRST) {
+      first_fit(shm_address, args);
   }
   /*
   pointer = shm_address + 3;
@@ -329,6 +372,9 @@ int main(){
     sem_destroy(&mutex);
     return 0;
 }
+
+
+
 
 
 
