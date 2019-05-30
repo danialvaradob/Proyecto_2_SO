@@ -79,11 +79,12 @@ int main(int argc, char *argv[])
 
 
     //Memory filled with spaces
+    /*
     s = shm_address;                          
     for (int i = 0; i <= SIZEOFSHMSEG; i++) {          
         *s = ' ';
         s++;
-    }
+    } */
              
     printf("Initializer DONE\n");
 

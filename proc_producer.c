@@ -166,7 +166,7 @@ void write_log(int exec_time, int proc_size){
 
 void connect_shared_memory() {
   struct sembuf operations[2];
-  char         *shm_address, *pointer;
+  int         *shm_address, *pointer;
   int           semId,shmId, retval;
   key_t         semKey, shmKey;
 
@@ -196,8 +196,9 @@ void connect_shared_memory() {
     return -1;
   }
  
- /* Memory segmente  */
- shm_address = (char*)shmat(shmid, NULL, 0);
+ /* Memory segment  */
+shm_address = (int *)shmat(shmid, 0, 0);
+
  /* Check if the second semaphore is 0. If its no, the the spy    */
 /* process i allowed to read the shared memory                   */
 /* for the semaphore to reach zero before running the semop().   */
