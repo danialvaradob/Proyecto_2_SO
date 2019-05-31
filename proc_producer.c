@@ -41,6 +41,34 @@ struct processInfo {
     enum ProcessState state;   /* The current state of the process */
 };
 
+/* Struct used to represent a block of avaiable memory */
+struct memoryBlock {
+  int                   start;            /* Start position of the memory block  inside the memory segment*/
+  int                   avaiable_spaces;   /* Amount of avaiable bytes in the memory block */
+  struct memoryBlock   *next;
+} memory_block_t 
+
+
+void push(memory_block_t * head, int _start, _avaiable_spaces) {
+    memory_block_t * current = head;
+    while (current->next != NULL) {
+        current = current->next;
+    }
+
+    /* now we can add a new variable */
+    current->next = malloc(sizeof(memory_block_t));
+    current->next->start = _start;
+    current->next->avaiable_spaces = _avaiable_spaces;
+    current->next->next = NULL;
+}
+
+memoryBlock* create_memory_Structure() {
+    
+} 
+
+
+
+
 
 void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
   int *memory;
@@ -109,6 +137,7 @@ void release_memory(int *_memory, int _thread_id,int _memory_size) {
 
 
 }
+
 
 
 /* The parameter type specifies the type of message:
