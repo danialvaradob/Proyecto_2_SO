@@ -42,14 +42,15 @@ struct processInfo {
 };
 
 
-void first_fit(int *_memory, struct processInfo *args) {
+void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
   int *memory;
-  int size,temp ,memory_size, i = 0, counter = 0, flag = 1;
+  int size,temp ,memory_size, i = 0, counter = 0, flag = 1, thread_id;
+
   
   memory = _memory;
   size = args->size;
-
-  memory_size = SIZEOFSHMSEG;
+  thread_id = syscall(SYS_gettid);
+  memory_size = _memory_size;
 
  while (i < memory_size) {
     if (memory[i] == 0) {
@@ -67,7 +68,7 @@ void first_fit(int *_memory, struct processInfo *args) {
         if (flag) {
             temp = i;
             for (counter = 0; counter < size; counter++) {
-                memory[temp] =  syscall(SYS_gettid);
+                memory[temp] =  thread_id;
                 temp++;
             }
             break;
@@ -83,6 +84,29 @@ void first_fit(int *_memory, struct processInfo *args) {
 
 
 void best_fit(int *_memory) {
+  memory = _memory;
+  for (int i = 0; i < )
+}
+
+/*
+Releases the memory used by a certain thread
+Parameters:
+memory    = shared memory segment used
+thread_id = thread id used to release memory
+memory size
+
+*/
+void release_memory(int *_memory, int _thread_id,int _memory_size) {
+    int *memory;
+    memory = _memory;
+
+    for (int i = 0; i < _memory_size; i++) {
+        if (memory[i] == _thread_id) {
+            //Freeing memory
+            memory[i] = 0;
+        }
+    } 
+
 
 }
 
@@ -225,12 +249,95 @@ void write_log(int exec_time, int proc_size){
 }
 
 
+void end_thread_memory(struct processInfo *args, _memory_size) {
+  struct sembuf operations[2];
+  char         *shm_address, *pointer;
+  int           semid,shmid, retval;
+  key_t         semkey, shmkey;
+
+
+  // Thread sleeps
+  sleep(30000);
+
+  /* Generate the IPC key for the semaphore and memory segment */
+  semkey = ftok(SEMKEYPATH,SEMKEYID);
+  if ( semkey == (key_t)-1 ) {
+    printf("main: ftok() for sem failed\n");
+    return -1;
+  }
+
+  shmkey = ftok(SHMKEYPATH,SHMKEYID);
+  if ( shmkey == (key_t)-1 ) {
+    printf("main: ftok() for shm failed\n");
+    return -1;
+  }
+
+  semid = semget( semkey, NUMSEMS, 0666);
+  if ( semid == -1 ) {
+      printf("main: semget() failed\n");
+      return -1;
+  }
+
+  /* Get the created shared memory ID associated with the key */
+  shmid = shmget(shmkey, SIZEOFSHMSEG, 0666);
+  if (semid == -1) {
+    printf("main: shmget() failed\n");
+    return -1;
+  }
+ 
+ /* Memory segmente  */
+ shm_address = (char*)shmat(shmid, NULL, 0);
+
+
+  operations[0].sem_num = 0;
+  operations[0].sem_op =  0;
+  operations[0].sem_flg = 0;
+
+  operations[1].sem_num = 0;
+  operations[1].sem_op =  1;
+  operations[1].sem_flg = 0;
+
+  retval = semop( semid, operations, 2 );
+  if (retval == -1) {
+    printf("main: semop() failed\n");
+    return -1;
+  }
+
+
+  // memory released 
+  release_memory(shm_address,syscall(SYS_gettid), _memory_size)
+
+
+  operations[0].sem_num = 0;
+  operations[0].sem_op =  -1;
+  operations[0].sem_flg = 0;
+
+
+  retval = semop( semid, operations, 1 );
+  if (retval == -1) {
+    printf("main: semop() failed\n");
+    return -1;
+  }
+
+
+
+
+  /* Detach the shared memory segment from the current process.    */
+  retval = shmdt(shm_address);
+  if (retval==-1) {
+    printf("main: shmdt() failed\n");
+    return -1;
+  }
+
+}
+
+
 
 /*
 Method used to connect to the shared memory segment used throught the procceses.
 IPC 
 */
-int connect_shared_memory(AlgorithmType _type, struct processInfo *args) {
+int connect_shared_memory(AlgorithmType _type, struct processInfo *args, int _memory_size) {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
   int           semid,shmid, retval;
@@ -327,6 +434,9 @@ int connect_shared_memory(AlgorithmType _type, struct processInfo *args) {
     printf("main: shmdt() failed\n");
     return -1;
   }
+
+  //ending thread
+  end_thread_memory(args, _memory_size)
 
 }
 
