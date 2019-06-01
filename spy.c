@@ -3,6 +3,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <semaphore.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -15,7 +16,7 @@
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
-
+#define SNAME "/state_sem"
 
 int show_memory_state() {
     struct sembuf operations[2];
@@ -67,7 +68,7 @@ int show_memory_state() {
         return -1;
       }
 
-    
+
 
     /* Check if the second semaphore is 0. If its no, the the spy    */
     /* process i allowed to read the shared memory                   */
@@ -98,7 +99,7 @@ int show_memory_state() {
         *pointer = A;
         pointer++;
     }
-    
+
     */
 
       for (int i = 0; i < SIZEOFSHMSEG; i++) {
@@ -139,6 +140,32 @@ return 0;
 
 }
 
+int show_processes_states(){
+  FILE *fp;
+  char* filename = "states.txt";
+  sem_t *sem = sem_open(SNAME, 0);
+  char c;
+  /*Waiting for the semaphore*/
+  sem_wait(sem);
+  /*Reading file and creating maze */
+  fp = fopen(filename, "r");
+  if (fp == NULL){
+      printf("Could not open file %s",filename);
+  }
+
+  c = fgetc(fp);
+  while (c != EOF)
+  {
+      printf ("%c", c);
+      c = fgetc(fp);
+  }
+
+
+  fclose(fp);
+
+  /*Releasing the semaphore*/
+  sem_post(sem);
+}
 
 int main(int argc, char *argv[]) {
     int option;
@@ -149,7 +176,8 @@ int main(int argc, char *argv[]) {
         if (option == 1) {
             show_memory_state();
         } else if (option == 2) {
-            printf("Process 1\n");
+            show_processes_states();
+            //printf("Process 1\n");
         } else if (option == 3) {
             printf("Exiting....\n");
             break;
