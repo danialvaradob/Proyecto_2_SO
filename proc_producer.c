@@ -90,7 +90,7 @@ void change_state(char* state){
   sem_post(sem);
 }
 
-struct memoryBlock* create_memory_Structure(int *_memory_segment, int _memory_size) {
+struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_size) {
   int *memory;
   int memory_size, i = 0,  start, avaiable_spaces, flag = 1;
   memory = _memory_segment;
@@ -124,8 +124,32 @@ struct memoryBlock* create_memory_Structure(int *_memory_segment, int _memory_si
   return head;
 } 
 
+
+void print_list(node_t * head) {
+    node_t * current = head;
+
+    while (current != NULL) {
+        printf("%d\n", current->val);
+        current = current->next;
+    }
+}
+
 void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
-  
+    int size, max_space, position, size_difference;
+    struct memoryBlock* head = create_memory_structure(_memory, _memory_size);
+    size_difference = 0;
+
+
+    struct memoryBlock *curret = head;
+    while (current != NULL) {
+        size = current->size;
+        
+
+        current = current->next;
+
+    }
+
+
   
 }
 
