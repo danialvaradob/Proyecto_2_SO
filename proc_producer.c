@@ -46,27 +46,60 @@ struct memoryBlock {
   int                   start;            /* Start position of the memory block  inside the memory segment*/
   int                   avaiable_spaces;   /* Amount of avaiable bytes in the memory block */
   struct memoryBlock   *next;
-} memory_block_t 
+};
 
 
-void push(memory_block_t * head, int _start, _avaiable_spaces) {
-    memory_block_t * current = head;
+void push(struct memoryBlock * head, int _start,int _avaiable_spaces) {
+    struct memoryBlock *current = head;
     while (current->next != NULL) {
         current = current->next;
     }
 
     /* now we can add a new variable */
-    current->next = malloc(sizeof(memory_block_t));
+    current->next = malloc(sizeof(struct memoryBlock));
     current->next->start = _start;
     current->next->avaiable_spaces = _avaiable_spaces;
     current->next->next = NULL;
 }
 
-memoryBlock* create_memory_Structure() {
-    
+struct memoryBlock* create_memory_Structure(int *_memory_segment, int _memory_size) {
+  int *memory;
+  int memory_size, i = 0,  start, avaiable_spaces, flag = 1;
+  memory = _memory_segment;
+  memory_size = _memory_size;
+
+  //first memory block
+  struct memoryBlock * head = NULL;
+  head = malloc(sizeof(struct memoryBlock));
+
+
+  while (i < memory_size) {
+    if (memory[i] == 0) {
+        avaiable_spaces = 0;
+        start = i;
+        while (memory[i] == 0) {
+            avaiable_spaces++;
+            i++;
+        }
+        if (flag) {
+            head->start = start;
+            head->avaiable_spaces = avaiable_spaces;
+            head->next = NULL;
+            flag = 0;
+        } else {
+            push(head,start,avaiable_spaces);
+        }
+
+    }
+    i++;
+  }
+  return head;
 } 
 
-
+void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
+  
+  
+}
 
 
 
@@ -111,10 +144,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 
 
-void best_fit(int *_memory) {
-  memory = _memory;
-  for (int i = 0; i < )
-}
+//void best_fit(int *_memory) 
 
 /*
 Releases the memory used by a certain thread
@@ -124,7 +154,7 @@ thread_id = thread id used to release memory
 memory size
 
 */
-void release_memory(int *_memory, int _thread_id,int _memory_size) {
+void release_memory(int *_memory, int _thread_id, int _memory_size) {
     int *memory;
     memory = _memory;
 
@@ -191,47 +221,7 @@ void write_to_log(char* msg, struct processInfo *args, int type){
 }
 
 
-void* allocate_memory(void* pInfo){
-  struct processInfo *args = (struct processInfo *)pInfo;
-  printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
-  printf("I am going to sleep now \n");
-  for (int i = 0; i<args->execution_time;i++){
-    printf(".");//("%d",args->size);
-    fflush(stdout);
-    sleep(1);
-  }
-  printf("\nI'm wide awake now. Bye \n");
 
-  if (selected_algorithm == BEST){
-    char* msg = "Test ";
-    printf("Algoritmo Best-fit\n\n");
-
-    //Memory segment
-    connect_shared_memory(BEST);
-
-    //if the thread finds space in memory
-    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
-
-    //if the thread releases its assigned memory segment
-    write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
-
-    //if the thread doesn't find s
-    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
-  }else if (selected_algorithm == FIRST){
-
-    //Memory segment
-    connect_shared_memory();
-
-    printf("Algoritmo First-fit\n\n");
-  }else if (selected_algorithm == WORST){
-
-    //Memory segment
-    connect_shared_memory();
-    
-    printf("Algoritmo Worst-fit\n\n");
-  }
-
-}
 
 void* print_process_state(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
@@ -278,7 +268,7 @@ void write_log(int exec_time, int proc_size){
 }
 
 
-void end_thread_memory(struct processInfo *args, _memory_size) {
+int end_thread_memory(struct processInfo *args,int _memory_size) {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
   int           semid,shmid, retval;
@@ -315,7 +305,7 @@ void end_thread_memory(struct processInfo *args, _memory_size) {
   }
  
  /* Memory segmente  */
- shm_address = (char*)shmat(shmid, NULL, 0);
+  shm_address = (int *) shmat(shmid, 0, 0);
 
 
   operations[0].sem_num = 0;
@@ -334,7 +324,7 @@ void end_thread_memory(struct processInfo *args, _memory_size) {
 
 
   // memory released 
-  release_memory(shm_address,syscall(SYS_gettid), _memory_size)
+  release_memory(shm_address,syscall(SYS_gettid), _memory_size);
 
 
   operations[0].sem_num = 0;
@@ -366,7 +356,7 @@ void end_thread_memory(struct processInfo *args, _memory_size) {
 Method used to connect to the shared memory segment used throught the procceses.
 IPC 
 */
-int connect_shared_memory(AlgorithmType _type, struct processInfo *args, int _memory_size) {
+int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, int _memory_size) {
   struct sembuf operations[2];
   char         *shm_address, *pointer;
   int           semid,shmid, retval;
@@ -427,7 +417,7 @@ int connect_shared_memory(AlgorithmType _type, struct processInfo *args, int _me
 
   /*  Used by threads       */
   if (_type == FIRST) {
-      first_fit(shm_address, args);
+      first_fit(shm_address, args, _memory_size);
   }
   /*
   pointer = shm_address + 3;
@@ -465,7 +455,50 @@ int connect_shared_memory(AlgorithmType _type, struct processInfo *args, int _me
   }
 
   //ending thread
-  end_thread_memory(args, _memory_size)
+  end_thread_memory(args, _memory_size);
+
+}
+
+
+void* allocate_memory(void* pInfo){
+  struct processInfo *args = (struct processInfo *)pInfo;
+  printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
+  printf("I am going to sleep now \n");
+  for (int i = 0; i<args->execution_time;i++){
+    printf(".");//("%d",args->size);
+    fflush(stdout);
+    sleep(1);
+  }
+  printf("\nI'm wide awake now. Bye \n");
+
+  if (selected_algorithm == BEST){
+    char* msg = "Test ";
+    printf("Algoritmo Best-fit\n\n");
+
+    //Memory segment
+    //connect_shared_memory(BEST);
+
+    //if the thread finds space in memory
+    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+
+    //if the thread releases its assigned memory segment
+    write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
+
+    //if the thread doesn't find s
+    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
+  }else if (selected_algorithm == FIRST){
+
+    //Memory segment
+    connect_shared_memory(FIRST, args, 1024);
+
+    printf("Algoritmo First-fit\n\n");
+  }else if (selected_algorithm == WORST){
+
+    //Memory segment
+    //connect_shared_memory();
+    
+    printf("Algoritmo Worst-fit\n\n");
+  }
 
 }
 
