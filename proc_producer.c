@@ -10,6 +10,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <fcntl.h>
+
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -23,7 +25,7 @@
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
-
+#define SNAME "/state_sem"
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
 enum ProcessState{RUNNING, BLOCKED, IN_CRITICAL_REGION};
@@ -60,6 +62,32 @@ void push(struct memoryBlock * head, int _start,int _avaiable_spaces) {
     current->next->start = _start;
     current->next->avaiable_spaces = _avaiable_spaces;
     current->next->next = NULL;
+}
+
+
+void change_state(char* state){
+  FILE *fp;
+  char* filename = "states.txt";
+  char* msg = "%d - %s\n";
+  sem_t *sem = sem_open(SNAME, O_CREAT, 0644, 3);
+  /*Waiting for the semaphore*/
+  sem_wait(sem);
+  /*Reading file and creating maze */
+  fp = fopen(filename, "a");
+  if (fp == NULL){
+      printf("Could not open file %s",filename);
+  }
+
+  fprintf(fp,
+    msg,
+    syscall(SYS_gettid),
+    state);
+
+
+  fclose(fp);
+
+  /*Releasing the semaphore*/
+  sem_post(sem);
 }
 
 struct memoryBlock* create_memory_Structure(int *_memory_segment, int _memory_size) {
@@ -107,7 +135,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
   int *memory;
   int size,temp ,memory_size, i = 0, counter = 0, flag = 1, thread_id;
 
-  
+
   memory = _memory;
   size = args->size;
   thread_id = syscall(SYS_gettid);
@@ -124,8 +152,8 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
                 temp++;
             }
         }
-    
-    
+
+
         if (flag) {
             temp = i;
             for (counter = 0; counter < size; counter++) {
@@ -144,7 +172,6 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 
 
-//void best_fit(int *_memory) 
 
 /*
 Releases the memory used by a certain thread
@@ -163,7 +190,7 @@ void release_memory(int *_memory, int _thread_id, int _memory_size) {
             //Freeing memory
             memory[i] = 0;
         }
-    } 
+    }
 
 
 }
@@ -219,9 +246,6 @@ void write_to_log(char* msg, struct processInfo *args, int type){
   /*Releasing the semaphore*/
   sem_post(&mutex);
 }
-
-
-
 
 void* print_process_state(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
