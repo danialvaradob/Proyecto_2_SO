@@ -74,7 +74,7 @@ void change_state(char* state){
   sem_wait(sem);
   /*Reading file and creating maze */
   fp = fopen(filename, "a");
-  if (fp == NULL){
+  if (fp == NULL) {
       printf("Could not open file %s",filename);
   }
 
@@ -125,31 +125,74 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
 } 
 
 
-void print_list(node_t * head) {
-    node_t * current = head;
+void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
+
+    int space_size, min_space = 0, position_selected, thread_size, memory_block_pos, i,
+            thread_id, size_difference;
+    struct memoryBlock *current, *head;
+    int *memory;
+
+    head = create_memory_structure(_memory, _memory_size);
+    thread_size = args->size;
+    thread_id = syscall(SYS_gettid);
+    memory = _memory;
+    current = head;
+
 
     while (current != NULL) {
-        printf("%d\n", current->val);
+        space_size = current->avaiable_spaces;
+        memory_block_pos = current->start;
+
+        size_difference = space_size - thread_size;
         current = current->next;
+        if (size_difference < min_space) {
+            min_space = size_difference;
+            position_selected = memory_block_pos;
+        }
+
     }
+
+    i = position_selected;
+    while (i < thread_size) {
+        memory[i] = thread_id;
+        i++;
+    }
+  
 }
 
-void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
-    int size, max_space, position, size_difference;
-    struct memoryBlock* head = create_memory_structure(_memory, _memory_size);
-    size_difference = 0;
+
+void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
+
+    int space_size, max_space = 0, position_selected, thread_size, memory_block_pos, i,
+            thread_id, size_difference;
+    struct memoryBlock *current, *head;
+    int *memory;
+
+    head = create_memory_structure(_memory, _memory_size);
+    thread_size = args->size;
+    thread_id = syscall(SYS_gettid);
+    memory = _memory;
+    current = head;
 
 
-    struct memoryBlock *curret = head;
     while (current != NULL) {
-        size = current->size;
-        
+        space_size = current->avaiable_spaces;
+        memory_block_pos = current->start;
 
+        size_difference = space_size - thread_size;
         current = current->next;
+        if (size_difference > max_space) {
+            max_space = size_difference;
+            position_selected = memory_block_pos;
+        }
 
     }
 
-
+    i = position_selected;
+    while (i < thread_size) {
+        memory[i] = thread_id;
+        i++;
+    }
   
 }
 
@@ -466,6 +509,10 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
   /*  Used by threads       */
   if (_type == FIRST) {
       first_fit(shm_address, args, _memory_size);
+  } else if (_type == WORST) {
+      worst_fit(shm_address, args, _memory_size);
+  } else if (_type == BEST) {
+      best_fit(shm_address, args, _memory_size);
   }
   /*
   pointer = shm_address + 3;
@@ -524,7 +571,7 @@ void* allocate_memory(void* pInfo){
     printf("Algoritmo Best-fit\n\n");
 
     //Memory segment
-    //connect_shared_memory(BEST);
+    connect_shared_memory(BEST, args, 1024);
 
     //if the thread finds space in memory
     write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
@@ -543,7 +590,7 @@ void* allocate_memory(void* pInfo){
   }else if (selected_algorithm == WORST){
 
     //Memory segment
-    //connect_shared_memory();
+    connect_shared_memory(WORST, args, 1024);;
     
     printf("Algoritmo Worst-fit\n\n");
   }
