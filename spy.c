@@ -4,6 +4,7 @@
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <semaphore.h>
+#include <stdlib.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -11,12 +12,31 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
+int SIZEOFSHMSEG;       /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
 #define SNAME "/state_sem"
+#define MAXCHAR 10000
+
+int get_memory_size(){
+  FILE *fp;
+  char* filename = "config.txt";
+  char* msg = "%d";
+  char str[MAXCHAR];
+  int size;
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+     printf("Could not open file %s",filename);
+  }
+
+  if (fgets(str, MAXCHAR, fp) != NULL){
+    size = atoi(str);
+  }
+  fclose(fp);
+  return size;
+}
 
 int show_memory_state() {
     struct sembuf operations[2];
@@ -169,6 +189,7 @@ int show_processes_states(){
 
 int main(int argc, char *argv[]) {
     int option;
+    SIZEOFSHMSEG = get_memory_size();
     while (1) {
         printf("Welcome to the Spy Process.\nEnter 1 for the memory status\nEnter 2 for the proccesses status\nEnter 3 to exit\nResponse: ");
         scanf("%d",&option);
