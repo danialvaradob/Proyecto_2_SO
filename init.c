@@ -18,11 +18,31 @@
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
+
+void save_config(int size){
+  FILE *fp;
+  char* filename = "config.txt";
+  char* msg = "%d";
+
+  /*Reading file and creating maze */
+  fp = fopen(filename, "w");
+  if (fp == NULL) {
+     printf("Could not open file %s",filename);
+  }
+
+  fprintf(fp, msg, size);
+
+  fclose(fp);
+
+}
+
+
 int main(int argc, char *argv[])
 {
     int SIZEOFSHMSEG;
     printf("Enter the size of the memory (in lines): ");
     scanf("%d",&SIZEOFSHMSEG);
+    save_config(SIZEOFSHMSEG);
 
     int retval, semid, shmid, i;
     key_t semkey, shmkey;

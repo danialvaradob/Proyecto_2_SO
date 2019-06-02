@@ -58,3 +58,7 @@ The memory segment from addresses 0 to 4 was allocated to the process/thread 864
 The process 8646 freed the memory segment from addresses 0 to 4 on Fri May 31 18:43:39 2019
 The process 8646 couldn't find space in memory and died on Fri May 31 18:43:39 2019
 Process/thread created with 6 lines and 27 s of execution time on Fri May 31 18:44:12 2019
+Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 13:14:29 2019
+Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 13:17:29 2019
+Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 14:04:22 2019
+Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 14:06:44 2019

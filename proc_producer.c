@@ -19,13 +19,14 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 1024       /* Size of the shared mem segment    */
+int SIZEOFSHMSEG;           /* Size of the shared mem segment    */
 #define BLOCKSIZE 10
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
 
 #define SNAME "/state_sem"
+#define MAXCHAR 10000
 
 enum AlgorithmType{BEST=1, FIRST=2, WORST=3};
 enum ProcessState{RUNNING, BLOCKED, IN_CRITICAL_REGION};
@@ -50,6 +51,23 @@ struct memoryBlock {
   struct memoryBlock   *next;
 };
 
+int get_memory_size(){
+  FILE *fp;
+  char* filename = "config.txt";
+  char* msg = "%d";
+  char str[MAXCHAR];
+  int size;
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+     printf("Could not open file %s",filename);
+  }
+
+  if (fgets(str, MAXCHAR, fp) != NULL){
+    size = atoi(str);
+  }
+  fclose(fp);
+  return size;
+}
 
 void push(struct memoryBlock * head, int _start,int _avaiable_spaces) {
     struct memoryBlock *current = head;
@@ -122,7 +140,7 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
     i++;
   }
   return head;
-} 
+}
 
 
 void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
@@ -157,7 +175,7 @@ void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
         memory[i] = thread_id;
         i++;
     }
-  
+
 }
 
 
@@ -193,7 +211,7 @@ void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
         memory[i] = thread_id;
         i++;
     }
-  
+
 }
 
 
@@ -314,7 +332,7 @@ void write_to_log(char* msg, struct processInfo *args, int type){
   sem_post(&mutex);
 }
 
-void* print_process_state(void* pInfo){
+/*void* print_process_state(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
   printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
   printf("I am going to sleep now \n");
@@ -326,7 +344,7 @@ void* print_process_state(void* pInfo){
   printf("\nI'm wide awake now. Bye \n");
   //pthread_exit((void *)0);
   //sleep(args->execution_time);
-}
+}*/
 
 void write_log(int exec_time, int proc_size){
     FILE *fp;
@@ -394,7 +412,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
     printf("main: shmget() failed\n");
     return -1;
   }
- 
+
  /* Memory segmente  */
   shm_address = (int *) shmat(shmid, 0, 0);
 
@@ -414,7 +432,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
   }
 
 
-  // memory released 
+  // memory released
   release_memory(shm_address,syscall(SYS_gettid), _memory_size);
 
 
@@ -445,7 +463,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
 
 /*
 Method used to connect to the shared memory segment used throught the procceses.
-IPC 
+IPC
 */
 int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, int _memory_size) {
   struct sembuf operations[2];
@@ -478,7 +496,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
     printf("main: shmget() failed\n");
     return -1;
   }
- 
+
  /* Memory segmente  */
  shm_address = (char*)shmat(shmid, NULL, 0);
  /* Check if the second semaphore is 0. If its no, the the spy    */
@@ -558,51 +576,49 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
 void* allocate_memory(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
   printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
-  printf("I am going to sleep now \n");
-  for (int i = 0; i<args->execution_time;i++){
+  printf("Size of the memory: %d \n", SIZEOFSHMSEG);
+  /*for (int i = 0; i<args->execution_time;i++){
     printf(".");//("%d",args->size);
     fflush(stdout);
     sleep(1);
-  }
-  printf("\nI'm wide awake now. Bye \n");
+  }*/
+  //printf("\nI'm wide awake now. Bye \n");
 
   if (selected_algorithm == BEST){
     char* msg = "Test ";
-    printf("Algoritmo Best-fit\n\n");
+    //printf("Algoritmo Best-fit\n\n");
 
     //Memory segment
     connect_shared_memory(BEST, args, 1024);
 
     //if the thread finds space in memory
-    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+    //write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
 
     //if the thread releases its assigned memory segment
-    write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
+    //write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
 
     //if the thread doesn't find s
-    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
+    //write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
   }else if (selected_algorithm == FIRST){
 
     //Memory segment
     connect_shared_memory(FIRST, args, 1024);
 
-    printf("Algoritmo First-fit\n\n");
+    //printf("Algoritmo First-fit\n\n");
   }else if (selected_algorithm == WORST){
 
     //Memory segment
     connect_shared_memory(WORST, args, 1024);;
-    
-    printf("Algoritmo Worst-fit\n\n");
+
+    //printf("Algoritmo Worst-fit\n\n");
   }
 
 }
 
 int main(){
     int proc_size, exec_time, producer_wait;
+    SIZEOFSHMSEG = get_memory_size();
     sem_init(&mutex, 0, 1);
-
-
-
     enum AlgorithmType algorithmNumber;
 
     /* Cycle for validating user's input */

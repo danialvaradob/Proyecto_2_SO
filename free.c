@@ -5,6 +5,7 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <stdlib.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -12,10 +13,28 @@
 #define SHMKEYID 1              /* Id used on ftok for shmget key    */
 
 #define NUMSEMS 1               /* Num of sems in created sem set    */
-#define SIZEOFSHMSEG 1024        /* Size of the shared mem segment    */
+int SIZEOFSHMSEG;        /* Size of the shared mem segment    */
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
+#define MAXCHAR 10000
+int get_memory_size(){
+  FILE *fp;
+  char* filename = "config.txt";
+  char* msg = "%d";
+  char str[MAXCHAR];
+  int size;
+  fp = fopen(filename, "r");
+  if (fp == NULL) {
+     printf("Could not open file %s",filename);
+  }
+
+  if (fgets(str, MAXCHAR, fp) != NULL){
+    size = atoi(str);
+  }
+  fclose(fp);
+  return size;
+}
 
 int main(int argc, char *argv[])
 {
@@ -24,6 +43,7 @@ int main(int argc, char *argv[])
     int semid, shmid, rc;
     key_t semkey, shmkey;
     struct shmid_ds shmid_struct;
+    SIZEOFSHMSEG = get_memory_size();
 
     /* Generate an IPC key for the semaphore set and the shared      */
     /* memory segment.  Typically, an application specific path and  */
@@ -141,5 +161,5 @@ int main(int argc, char *argv[])
           }
 
      }
-       
+
 }
