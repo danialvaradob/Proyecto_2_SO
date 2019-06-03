@@ -5,6 +5,8 @@
 #include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
+#include <time.h>
+#include <assert.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -19,6 +21,31 @@
                                    on shm segment                    */
 
 
+void write_to_log(int size){
+  FILE *fp;
+  char* filename = "log.txt";
+  char* msg = "Program initialized at %s with a shared memory of %d lines\n\n";
+
+  /*Getting the datetime for the log entry*/
+  time_t t = time(NULL);
+  struct tm *tm = localtime(&t);
+  char s[64];
+  assert(strftime(s, sizeof(s), "%c", tm));
+
+  /*Reading file and creating maze */
+  fp = fopen(filename, "w");
+  if (fp == NULL) {
+    printf("Could not open file %s",filename);
+  }
+
+  fprintf(fp, msg, s, size);
+
+  fclose(fp);
+
+}
+
+/*Saves the size of the memory in
+the config.txt file*/
 void save_config(int size){
   FILE *fp;
   char* filename = "config.txt";
@@ -112,6 +139,7 @@ int main(int argc, char *argv[])
 
 
     printf("Initializer DONE\n");
+    write_to_log(SIZEOFSHMSEG);
 
 
     /*Set the shared memory segment for use using the semaphore.     */
