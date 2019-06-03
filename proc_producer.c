@@ -187,7 +187,8 @@ void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
     //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
 
     i = position_selected;
-    while (i <= thread_size) {
+    args->base_register = i;
+    while (i < thread_size) {
         memory[i] = thread_id;
         //printf("Memory: %d\n In pos: %d", memory[i], i );
         i++;
@@ -223,6 +224,7 @@ void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     }
     i = position_selected;
+    args->base_register = i;
     while (i < thread_size) {
         memory[i] = thread_id;
         i++;
@@ -257,7 +259,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 
         if (flag) {
-            //args->base_register = i;
+            args->base_register = i;
             temp = i;
             for (counter = 0; counter < size; counter++) {
                 memory[temp] =  thread_id;
@@ -546,6 +548,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
   /*  Used by threads       */
   if (_type == FIRST) {
     first_fit(shm_address, args, _memory_size);
+    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
       /*if (first_fit(shm_address, args, _memory_size)){
         write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
       }else{
