@@ -48,7 +48,7 @@ struct processInfo {
 struct memoryBlock {
   int                   start;            /* Start position of the memory block  inside the memory segment*/
   int                   avaiable_spaces;   /* Amount of avaiable bytes in the memory block */
-  struct memoryBlock   *next;
+  struct memoryBlock    *next;
 };
 
 int get_memory_size(){
@@ -146,8 +146,8 @@ void print_list(struct memoryBlock * head) {
     struct memoryBlock * current = head;
 
     while (current != NULL) {
-        printf("START:  %d\n", current->start);
-        printf("SPACES: %d\n", current->avaiable_spaces);
+        //printf("START:  %d\n", current->start);
+        //printf("SPACES: %d\n", current->avaiable_spaces);
 
         current = current->next;
     }
@@ -170,12 +170,12 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     while (current != NULL) {
         space_size = current->avaiable_spaces;
-        printf("Space size: %d\n",space_size);
+        //printf("Space size: %d\n",space_size);
         memory_block_pos = current->start;
-        printf("Memory Block pos%d\n",memory_block_pos);
+        //printf("Memory Block pos%d\n",memory_block_pos);
 
         size_difference = space_size - thread_size;
-        printf("Size difference: %d\n", size_difference);
+        //printf("Size difference: %d\n", size_difference);
         current = current->next;
         if ((size_difference < min_space) && (size_difference >= 0)) {
             min_space = size_difference;
@@ -184,16 +184,16 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     }
 
-    printf("START POS SELECTED %d\n", position_selected);
-    printf("MIN SIZE DIFFERENCE %d\n",  min_space);
+    //printf("START POS SELECTED %d\n", position_selected);
+    //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
 
     if (position_selected != -1) {
       i = position_selected;
       args->base_register = i;
-	  printf("THE SIZE OF THE THREAD IS: %d\n",thread_size);
+	  //printf("THE SIZE OF THE THREAD IS: %d\n",thread_size);
       while (i < thread_size+position_selected) { //position_selected es el offset
           memory[i] = thread_id;
-          printf("Memory: %d In pos: %d\n", memory[i], i );
+          //printf("Memory: %d In pos: %d\n", memory[i], i );
           i++;
       }
       found_space = 1;
@@ -237,7 +237,6 @@ int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
       args->base_register = i;
       while (i < thread_size+position_selected) {
           memory[i] = thread_id;
-          printf("Memory: %d In pos: %d\n", memory[i], i );
           i++;
       }
       found_space = 1;
@@ -248,7 +247,7 @@ int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 
 
-void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
+int first_fit(int *_memory, struct processInfo *args,int _memory_size) {
   int *memory;
   int size,temp ,memory_size, i = 0, counter = 0, flag = 1, thread_id;
 
@@ -285,6 +284,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
     }
     i++;
  }
+ return flag;
 }
 
 
@@ -334,25 +334,42 @@ void write_to_log(char* msg, struct processInfo *args, int type){
   assert(strftime(s, sizeof(s), "%c", tm));
 
   if (type == 1){
+    //Print to screen the log entry
+    printf(msg,
+    args->base_register,
+    args->base_register + args->size-1,
+    syscall(SYS_gettid),
+    s);
+
     fprintf(fp,
       msg,
       args->base_register,
-      args->base_register + args->size,
+      args->base_register + args->size-1,
       syscall(SYS_gettid),
       s);
     fflush(fp);
   }else if (type == 2){
+    printf(msg,
+    syscall(SYS_gettid),
+    s);
+
     fprintf(fp,
       msg,
       syscall(SYS_gettid),
       s);
     fflush(fp);
   }else if (type == 3){
+    printf(msg,
+    syscall(SYS_gettid),
+    args->base_register,
+    args->base_register + args->size-1,
+    s);
+
     fprintf(fp,
       msg,
       syscall(SYS_gettid),
       args->base_register,
-      args->base_register + args->size,
+      args->base_register + args->size-1,
       s);
     fflush(fp);
   }
@@ -445,7 +462,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
     return -1;
   }
 
- /* Memory segmente  */
+ /* Memory segment */
   shm_address = (int *) shmat(shmid, 0, 0);
 
 
@@ -558,20 +575,20 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
   }
 
 
-
+  int successfull_allocation = 0;
   /*  Used by threads       */
   if (_type == FIRST) {
-    first_fit(shm_address, args, _memory_size);
-    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
-      /*if (first_fit(shm_address, args, _memory_size)){
-        write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
-      }else{
-        write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
-      }*/
+    successfull_allocation = first_fit(shm_address, args, _memory_size);
   } else if (_type == WORST) {
-      worst_fit(shm_address, args, _memory_size);
+      successfull_allocation = worst_fit(shm_address, args, _memory_size);
   } else if (_type == BEST) {
-      best_fit(shm_address, args, _memory_size);
+      successfull_allocation = best_fit(shm_address, args, _memory_size);
+  }
+
+  if (successfull_allocation){
+    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+  }else{
+    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
   }
 
   /*
@@ -628,9 +645,6 @@ void* allocate_memory(void* pInfo){
   //printf("\nI'm wide awake now. Bye \n");
 
   if (selected_algorithm == BEST){
-    char* msg = "Test ";
-    //printf("Algoritmo Best-fit\n\n");
-
     //Memory segment
     connect_shared_memory(BEST, args, SIZEOFSHMSEG);
 
@@ -643,17 +657,13 @@ void* allocate_memory(void* pInfo){
     //if the thread doesn't find s
     //write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
   }else if (selected_algorithm == FIRST){
-
     //Memory segment
     connect_shared_memory(FIRST, args, SIZEOFSHMSEG);
 
-    //printf("Algoritmo First-fit\n\n");
   }else if (selected_algorithm == WORST){
-
     //Memory segment
     connect_shared_memory(WORST, args, SIZEOFSHMSEG);
 
-    //printf("Algoritmo Worst-fit\n\n");
   }
 
 
