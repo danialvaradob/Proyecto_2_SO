@@ -161,6 +161,7 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
     int *memory;
 
     head = create_memory_structure(_memory, _memory_size);
+    print_list(head);
     thread_size = args->size;
     thread_id = syscall(SYS_gettid);
     memory = _memory;

@@ -1,64 +1,17 @@
+Program initialized at Mon Jun  3 12:25:19 2019 with a shared memory of 50 lines
 
-Process/thread created with 4 lines and 56 s of execution time on Sun May 19 14:03:27 2019
-The memory segment from addresses 0 to 4 was allocated to the process/thread 12932 on Sun May 19 14:04:23 2019
-The process 12932 freed the memory segment from addresses 0 to 4 on Sun May 19 14:04:23 2019
-The process 12932 couldn't find space in memory and died on Sun May 19 14:04:23 2019
-Process/thread created with 6 lines and 27 s of execution time on Sun May 19 14:04:56 2019
-The memory segment from addresses 0 to 6 was allocated to the process/thread 12984 on Sun May 19 14:05:23 2019
-The process 12984 freed the memory segment from addresses 0 to 6 on Sun May 19 14:05:23 2019
-The process 12984 couldn't find space in memory and died on Sun May 19 14:05:23 2019
-Process/thread created with 7 lines and 52 s of execution time on Sun May 19 14:06:11 2019
-The memory segment from addresses 0 to 7 was allocated to the process/thread 13025 on Sun May 19 14:07:03 2019
-The process 13025 freed the memory segment from addresses 0 to 7 on Sun May 19 14:07:03 2019
-The process 13025 couldn't find space in memory and died on Sun May 19 14:07:03 2019
-Process/thread created with 2 lines and 47 s of execution time on Sun May 19 14:07:50 2019
-The memory segment from addresses 0 to 2 was allocated to the process/thread 13086 on Sun May 19 14:08:37 2019
-The process 13086 freed the memory segment from addresses 0 to 2 on Sun May 19 14:08:37 2019
-The process 13086 couldn't find space in memory and died on Sun May 19 14:08:37 2019
------ Execution ended on Mon May 20 14:36:05 2019 -----Process/thread created with 4 lines and 56 s of execution time on Fri May 31 17:41:16 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 17:42:06 2019
-Process/thread created with 6 lines and 27 s of execution time on Fri May 31 17:43:35 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 17:44:29 2019
-The memory segment from addresses 0 to 4 was allocated to the process/thread 6962 on Fri May 31 17:45:25 2019
-The process 6962 freed the memory segment from addresses 0 to 4 on Fri May 31 17:45:25 2019
-The process 6962 couldn't find space in memory and died on Fri May 31 17:45:25 2019
-Process/thread created with 6 lines and 27 s of execution time on Fri May 31 17:45:58 2019
-The memory segment from addresses 0 to 6 was allocated to the process/thread 6993 on Fri May 31 17:46:25 2019
-The process 6993 freed the memory segment from addresses 0 to 6 on Fri May 31 17:46:25 2019
-The process 6993 couldn't find space in memory and died on Fri May 31 17:46:25 2019
-Process/thread created with 7 lines and 52 s of execution time on Fri May 31 17:47:13 2019
-The memory segment from addresses 0 to 7 was allocated to the process/thread 7021 on Fri May 31 17:48:05 2019
-The process 7021 freed the memory segment from addresses 0 to 7 on Fri May 31 17:48:05 2019
-The process 7021 couldn't find space in memory and died on Fri May 31 17:48:05 2019
-Process/thread created with 2 lines and 47 s of execution time on Fri May 31 17:48:52 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:01:44 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:10:30 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:11:41 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:19:42 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:26:49 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:27:17 2019
-The memory segment from addresses 0 to 4 was allocated to the process/thread 8130 on Fri May 31 18:28:13 2019
-The process 8130 freed the memory segment from addresses 0 to 4 on Fri May 31 18:28:13 2019
-The process 8130 couldn't find space in memory and died on Fri May 31 18:28:13 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:30:32 2019
-The memory segment from addresses 0 to 4 was allocated to the process/thread 8248 on Fri May 31 18:31:28 2019
-The process 8248 freed the memory segment from addresses 0 to 4 on Fri May 31 18:31:28 2019
-The process 8248 couldn't find space in memory and died on Fri May 31 18:31:28 2019
-Process/thread created with 6 lines and 27 s of execution time on Fri May 31 18:32:01 2019
-The memory segment from addresses 0 to 6 was allocated to the process/thread 8269 on Fri May 31 18:32:28 2019
-The process 8269 freed the memory segment from addresses 0 to 6 on Fri May 31 18:32:28 2019
-The process 8269 couldn't find space in memory and died on Fri May 31 18:32:28 2019
-Process/thread created with 7 lines and 52 s of execution time on Fri May 31 18:33:16 2019
-The memory segment from addresses 0 to 7 was allocated to the process/thread 8352 on Fri May 31 18:34:08 2019
-The process 8352 freed the memory segment from addresses 0 to 7 on Fri May 31 18:34:08 2019
-The process 8352 couldn't find space in memory and died on Fri May 31 18:34:08 2019
-Process/thread created with 2 lines and 47 s of execution time on Fri May 31 18:34:55 2019
-Process/thread created with 4 lines and 56 s of execution time on Fri May 31 18:42:43 2019
-The memory segment from addresses 0 to 4 was allocated to the process/thread 8646 on Fri May 31 18:43:39 2019
-The process 8646 freed the memory segment from addresses 0 to 4 on Fri May 31 18:43:39 2019
-The process 8646 couldn't find space in memory and died on Fri May 31 18:43:39 2019
-Process/thread created with 6 lines and 27 s of execution time on Fri May 31 18:44:12 2019
-Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 13:14:29 2019
-Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 13:17:29 2019
-Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 14:04:22 2019
-Process/thread created with 4 lines and 56 s of execution time on Sun Jun  2 14:06:44 2019
+Process/thread created with 9 lines and 56 s of execution time on Mon Jun  3 12:26:24 2019
+Process/thread created with 7 lines and 49 s of execution time on Mon Jun  3 12:26:29 2019
+Process/thread created with 2 lines and 48 s of execution time on Mon Jun  3 12:26:34 2019
+Process/thread created with 6 lines and 48 s of execution time on Mon Jun  3 12:26:39 2019
+Process/thread created with 7 lines and 53 s of execution time on Mon Jun  3 12:26:44 2019
+Process/thread created with 8 lines and 27 s of execution time on Mon Jun  3 12:26:49 2019
+Process/thread created with 10 lines and 40 s of execution time on Mon Jun  3 12:26:54 2019
+Process/thread created with 5 lines and 50 s of execution time on Mon Jun  3 12:26:59 2019
+Process/thread created with 2 lines and 28 s of execution time on Mon Jun  3 12:27:04 2019
+Process/thread created with 5 lines and 32 s of execution time on Mon Jun  3 12:27:09 2019
+Process/thread created with 6 lines and 60 s of execution time on Mon Jun  3 12:27:14 2019
+The process 1901 freed the memory segment from addresses 10 to 16 on Mon Jun  3 12:27:16 2019
+The process 1892 freed the memory segment from addresses 10 to 16 on Mon Jun  3 12:27:18 2019
+Process/thread created with 4 lines and 56 s of execution time on Mon Jun  3 12:27:19 2019
+The process 1891 freed the memory segment from addresses 10 to 14 on Mon Jun  3 12:27:20 2019
