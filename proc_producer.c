@@ -139,7 +139,6 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
     }
     i++;
   }
-  return head;
 }
 
 
@@ -240,6 +239,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 
         if (flag) {
+            //args->base_register = i;
             temp = i;
             for (counter = 0; counter < size; counter++) {
                 memory[temp] =  thread_id;
@@ -252,6 +252,7 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
     }
     i++;
  }
+ //return flag;
 
 }
 
@@ -276,7 +277,6 @@ void release_memory(int *_memory, int _thread_id, int _memory_size) {
             memory[i] = 0;
         }
     }
-
 
 }
 
@@ -379,14 +379,15 @@ void write_log(int exec_time, int proc_size){
 
 int end_thread_memory(struct processInfo *args,int _memory_size) {
   struct sembuf operations[2];
-  char         *shm_address, *pointer;
+  char         *pointer;
+  int           *shm_address;
   int           semid,shmid, retval;
   key_t         semkey, shmkey;
 
 
   // Thread sleeps
-  sleep(30000);
-
+  sleep(args->execution_time);
+  //sleep(1);
   /* Generate the IPC key for the semaphore and memory segment */
   semkey = ftok(SEMKEYPATH,SEMKEYID);
   if ( semkey == (key_t)-1 ) {
@@ -457,6 +458,8 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
     return -1;
   }
 
+
+
 }
 
 
@@ -467,8 +470,8 @@ IPC
 */
 int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, int _memory_size) {
   struct sembuf operations[2];
-  char         *shm_address, *pointer;
-  int           semid,shmid, retval;
+  char          *pointer;
+  int           *shm_address,semid,shmid, retval;
   key_t         semkey, shmkey;
 
   /* Generate the IPC key for the semaphore and memory segment */
@@ -498,7 +501,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
   }
 
  /* Memory segmente  */
- shm_address = (char*)shmat(shmid, NULL, 0);
+ shm_address = (int*)shmat(shmid, NULL, 0);
  /* Check if the second semaphore is 0. If its no, the the spy    */
   /* process i allowed to read the shared memory                   */
   /* for the semaphore to reach zero before running the semop().   */
@@ -526,12 +529,18 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
 
   /*  Used by threads       */
   if (_type == FIRST) {
-      first_fit(shm_address, args, _memory_size);
+    first_fit(shm_address, args, _memory_size);
+      /*if (first_fit(shm_address, args, _memory_size)){
+        write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+      }else{
+        write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
+      }*/
   } else if (_type == WORST) {
       worst_fit(shm_address, args, _memory_size);
   } else if (_type == BEST) {
       best_fit(shm_address, args, _memory_size);
   }
+
   /*
   pointer = shm_address + 3;
   for (char A ='A'; A < 'G'; A++) {
@@ -576,7 +585,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
 void* allocate_memory(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
   printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
-  printf("Size of the memory: %d \n", SIZEOFSHMSEG);
+  //printf("Size of the memory: %d \n", SIZEOFSHMSEG);
   /*for (int i = 0; i<args->execution_time;i++){
     printf(".");//("%d",args->size);
     fflush(stdout);
@@ -589,7 +598,7 @@ void* allocate_memory(void* pInfo){
     //printf("Algoritmo Best-fit\n\n");
 
     //Memory segment
-    connect_shared_memory(BEST, args, 1024);
+    connect_shared_memory(BEST, args, SIZEOFSHMSEG);
 
     //if the thread finds space in memory
     //write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
@@ -602,16 +611,17 @@ void* allocate_memory(void* pInfo){
   }else if (selected_algorithm == FIRST){
 
     //Memory segment
-    connect_shared_memory(FIRST, args, 1024);
+    connect_shared_memory(FIRST, args, SIZEOFSHMSEG);
 
     //printf("Algoritmo First-fit\n\n");
   }else if (selected_algorithm == WORST){
 
     //Memory segment
-    connect_shared_memory(WORST, args, 1024);;
+    connect_shared_memory(WORST, args, SIZEOFSHMSEG);;
 
     //printf("Algoritmo Worst-fit\n\n");
   }
+
 
 }
 
@@ -638,6 +648,8 @@ int main(){
 
     /* Cycle for creating the threads */
     while (1){
+        fflush(stdout);
+
       proc_size = rand() % 10 + 1;
       exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
 
@@ -645,13 +657,15 @@ int main(){
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
       pthread_create(&PID, NULL, allocate_memory, &pinfo);
       write_log(exec_time, proc_size);
-      pthread_join(PID, NULL);
+      //pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
       //sleep(1);//
       sleep(producer_wait);
 
     }
+            printf("%s\n", "PROC_PRODUCER TEST");
+    //pthread_join(PID, NULL);
     sem_destroy(&mutex);
     return 0;
 }

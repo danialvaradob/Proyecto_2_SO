@@ -104,10 +104,10 @@ int main(int argc, char *argv[])
 
 
     // TEST
-    for (int i = 5; i < (12); i++) {
+    /*for (int i = 5; i < (12); i++) {
         if (i !=10)
             shm_address[i] = i;
-    }
+    }*/
 
 
 
