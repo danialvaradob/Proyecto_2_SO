@@ -170,12 +170,12 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     while (current != NULL) {
         space_size = current->avaiable_spaces;
-        //printf("Space size: %d\n",space_size);
+        printf("Space size: %d\n",space_size);
         memory_block_pos = current->start;
-        //printf("Memory Block pos%d\n",memory_block_pos);
+        printf("Memory Block pos%d\n",memory_block_pos);
 
         size_difference = space_size - thread_size;
-        //printf("Size difference: %d\n", size_difference);
+        printf("Size difference: %d\n", size_difference);
         current = current->next;
         if ((size_difference < min_space) && (size_difference >= 0)) {
             min_space = size_difference;
@@ -184,15 +184,16 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     }
 
-    //printf("START POS SELECTED %d\n", position_selected);
-    //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
+    printf("START POS SELECTED %d\n", position_selected);
+    printf("MIN SIZE DIFFERENCE %d\n",  min_space);
 
     if (position_selected != -1) {
       i = position_selected;
       args->base_register = i;
+	printf("THE SIZE OF THE THREAD IS: %d\n",thread_size);
       while (i < thread_size) {
           memory[i] = thread_id;
-          //printf("Memory: %d\n In pos: %d", memory[i], i );
+          printf("Memory: %d In pos: %d\n", memory[i], i );
           i++;
       }
       found_space = 1;

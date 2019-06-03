@@ -1,17 +1,7 @@
-Program initialized at Mon Jun  3 12:25:19 2019 with a shared memory of 50 lines
+Program initialized at Mon Jun  3 12:46:40 2019 with a shared memory of 20 lines
 
-Process/thread created with 9 lines and 56 s of execution time on Mon Jun  3 12:26:24 2019
-Process/thread created with 7 lines and 49 s of execution time on Mon Jun  3 12:26:29 2019
-Process/thread created with 2 lines and 48 s of execution time on Mon Jun  3 12:26:34 2019
-Process/thread created with 6 lines and 48 s of execution time on Mon Jun  3 12:26:39 2019
-Process/thread created with 7 lines and 53 s of execution time on Mon Jun  3 12:26:44 2019
-Process/thread created with 8 lines and 27 s of execution time on Mon Jun  3 12:26:49 2019
-Process/thread created with 10 lines and 40 s of execution time on Mon Jun  3 12:26:54 2019
-Process/thread created with 5 lines and 50 s of execution time on Mon Jun  3 12:26:59 2019
-Process/thread created with 2 lines and 28 s of execution time on Mon Jun  3 12:27:04 2019
-Process/thread created with 5 lines and 32 s of execution time on Mon Jun  3 12:27:09 2019
-Process/thread created with 6 lines and 60 s of execution time on Mon Jun  3 12:27:14 2019
-The process 1901 freed the memory segment from addresses 10 to 16 on Mon Jun  3 12:27:16 2019
-The process 1892 freed the memory segment from addresses 10 to 16 on Mon Jun  3 12:27:18 2019
-Process/thread created with 4 lines and 56 s of execution time on Mon Jun  3 12:27:19 2019
-The process 1891 freed the memory segment from addresses 10 to 14 on Mon Jun  3 12:27:20 2019
+Process/thread created with 3 lines and 46 s of execution time on Mon Jun  3 12:46:57 2019
+Process/thread created with 9 lines and 22 s of execution time on Mon Jun  3 12:47:02 2019
+Process/thread created with 6 lines and 55 s of execution time on Mon Jun  3 12:47:07 2019
+Process/thread created with 4 lines and 35 s of execution time on Mon Jun  3 12:47:12 2019
+Process/thread created with 7 lines and 33 s of execution time on Mon Jun  3 12:47:17 2019
