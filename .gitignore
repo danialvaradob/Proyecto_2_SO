@@ -6,3 +6,5 @@ init
 proc_producer
 
 spy
+
+log\.txt

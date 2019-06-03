@@ -1,7 +1,0 @@
-Program initialized at Mon Jun  3 12:46:40 2019 with a shared memory of 20 lines
-
-Process/thread created with 3 lines and 46 s of execution time on Mon Jun  3 12:46:57 2019
-Process/thread created with 9 lines and 22 s of execution time on Mon Jun  3 12:47:02 2019
-Process/thread created with 6 lines and 55 s of execution time on Mon Jun  3 12:47:07 2019
-Process/thread created with 4 lines and 35 s of execution time on Mon Jun  3 12:47:12 2019
-Process/thread created with 7 lines and 33 s of execution time on Mon Jun  3 12:47:17 2019
