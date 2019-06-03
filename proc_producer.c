@@ -139,6 +139,7 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
     }
     i++;
   }
+  return head;
 }
 
 
@@ -204,12 +205,12 @@ void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
         }
 
     }
-
     i = position_selected;
     while (i < thread_size) {
         memory[i] = thread_id;
         i++;
     }
+
 
 }
 
@@ -252,8 +253,6 @@ void first_fit(int *_memory, struct processInfo *args,int _memory_size) {
     }
     i++;
  }
- //return flag;
-
 }
 
 
@@ -617,7 +616,7 @@ void* allocate_memory(void* pInfo){
   }else if (selected_algorithm == WORST){
 
     //Memory segment
-    connect_shared_memory(WORST, args, SIZEOFSHMSEG);;
+    connect_shared_memory(WORST, args, SIZEOFSHMSEG);
 
     //printf("Algoritmo Worst-fit\n\n");
   }
@@ -660,11 +659,10 @@ int main(){
       //pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
-      //sleep(1);//
-      sleep(producer_wait);
-
+      sleep(5);//
+      //sleep(producer_wait);
     }
-            printf("%s\n", "PROC_PRODUCER TEST");
+
     //pthread_join(PID, NULL);
     sem_destroy(&mutex);
     return 0;
