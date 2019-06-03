@@ -190,8 +190,8 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
     if (position_selected != -1) {
       i = position_selected;
       args->base_register = i;
-	printf("THE SIZE OF THE THREAD IS: %d\n",thread_size);
-      while (i < thread_size) {
+	  printf("THE SIZE OF THE THREAD IS: %d\n",thread_size);
+      while (i < thread_size+position_selected) { //position_selected es el offset
           memory[i] = thread_id;
           printf("Memory: %d In pos: %d\n", memory[i], i );
           i++;
@@ -199,15 +199,15 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
       found_space = 1;
 
     }
-    
-    
+
+
     return found_space;
 }
 
 
 int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
-    int space_size, max_space = 0, position_selected, thread_size, memory_block_pos, i,
+    int space_size, max_space = 0, position_selected = -1, thread_size, memory_block_pos, i,
             thread_id, size_difference, found_space = 0;
     struct memoryBlock *current, *head;
     int *memory;
@@ -225,7 +225,7 @@ int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
         size_difference = space_size - thread_size;
         current = current->next;
-        if (size_difference > max_space) {
+        if (size_difference >= max_space) {
             max_space = size_difference;
             position_selected = memory_block_pos;
         }
@@ -235,15 +235,14 @@ int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
     if (position_selected != -1) {
       i = position_selected;
       args->base_register = i;
-      while (i < thread_size) {
+      while (i < thread_size+position_selected) {
           memory[i] = thread_id;
-          //printf("Memory: %d\n In pos: %d", memory[i], i );
+          printf("Memory: %d In pos: %d\n", memory[i], i );
           i++;
       }
       found_space = 1;
 
     }
-
     return found_space;
 }
 
@@ -618,7 +617,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
 
 void* allocate_memory(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
-  printf("Process: %li Size: %d Exec_time: %d\n",
+  printf("\n\nProcess: %li Size: %d Exec_time: %d\n",
               syscall(SYS_gettid), args->size, args->execution_time);
   //printf("Size of the memory: %d \n", SIZEOFSHMSEG);
   /*for (int i = 0; i<args->execution_time;i++){
@@ -697,7 +696,7 @@ int main(){
       //pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
-      sleep(5);//
+      sleep(2);//
       //sleep(producer_wait);
     }
 
