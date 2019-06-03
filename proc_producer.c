@@ -142,10 +142,20 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
   return head;
 }
 
+void print_list(struct memoryBlock * head) {
+    struct memoryBlock * current = head;
+
+    while (current != NULL) {
+        printf("START:  %d\n", current->start);
+        printf("SPACES: %d\n", current->avaiable_spaces);
+        
+        current = current->next;
+    }
+}
 
 void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
-    int space_size, min_space = 0, position_selected, thread_size, memory_block_pos, i,
+    int space_size, min_space = _memory_size, position_selected, thread_size, memory_block_pos, i,
             thread_id, size_difference;
     struct memoryBlock *current, *head;
     int *memory;
@@ -159,20 +169,27 @@ void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     while (current != NULL) {
         space_size = current->avaiable_spaces;
+        //printf("Space size: %d\n",space_size);
         memory_block_pos = current->start;
+        //printf("Memory Block pos%d\n",memory_block_pos);
 
         size_difference = space_size - thread_size;
+        //printf("Size difference: %d\n", size_difference);
         current = current->next;
-        if (size_difference < min_space) {
+        if ((size_difference < min_space) && (size_difference >= 0)) {
             min_space = size_difference;
             position_selected = memory_block_pos;
         }
 
     }
 
+    //printf("START POS SELECTED %d\n", position_selected);
+    //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
+    
     i = position_selected;
-    while (i < thread_size) {
+    while (i <= thread_size) {
         memory[i] = thread_id;
+        //printf("Memory: %d\n In pos: %d", memory[i], i );
         i++;
     }
 
