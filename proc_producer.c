@@ -177,7 +177,7 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
         size_difference = space_size - thread_size;
         //printf("Size difference: %d\n", size_difference);
         current = current->next;
-        if ((size_difference < min_space) && (size_difference >= 0)) {
+        if ((size_difference <= min_space) && (size_difference >= 0)) {
             min_space = size_difference;
             position_selected = memory_block_pos;
         }
@@ -696,8 +696,9 @@ int main(){
 
       proc_size = rand() % 10 + 1;
 
-        fflush(stdout);
-      exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
+      fflush(stdout);
+        //num = (rand() % (upper – lower + 1)) + lower
+      exec_time = (rand() % (60 - 20 + 1)) + 20;
 
       pthread_t PID;
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
@@ -706,8 +707,8 @@ int main(){
       //pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
-      sleep(2);//
-      //sleep(producer_wait);
+      //sleep(2);
+      sleep(producer_wait);
     }
 
     //pthread_join(PID, NULL);
