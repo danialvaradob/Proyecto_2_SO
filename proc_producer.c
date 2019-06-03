@@ -153,10 +153,10 @@ void print_list(struct memoryBlock * head) {
     }
 }
 
-void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
+int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
-    int space_size, min_space = _memory_size, position_selected, thread_size, memory_block_pos, i,
-            thread_id, size_difference;
+    int space_size, min_space = _memory_size, position_selected = -1, thread_size, memory_block_pos, i,
+            thread_id, size_difference, found_space = 0;
     struct memoryBlock *current, *head;
     int *memory;
 
@@ -186,21 +186,27 @@ void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
     //printf("START POS SELECTED %d\n", position_selected);
     //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
 
-    i = position_selected;
-    args->base_register = i;
-    while (i < thread_size) {
-        memory[i] = thread_id;
-        //printf("Memory: %d\n In pos: %d", memory[i], i );
-        i++;
-    }
+    if (position_selected != -1) {
+      i = position_selected;
+      args->base_register = i;
+      while (i < thread_size) {
+          memory[i] = thread_id;
+          //printf("Memory: %d\n In pos: %d", memory[i], i );
+          i++;
+      }
+      found_space = 1;
 
+    }
+    
+    
+    return found_space;
 }
 
 
-void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
+int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     int space_size, max_space = 0, position_selected, thread_size, memory_block_pos, i,
-            thread_id, size_difference;
+            thread_id, size_difference, found_space = 0;
     struct memoryBlock *current, *head;
     int *memory;
 
@@ -223,14 +229,20 @@ void worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
         }
 
     }
-    i = position_selected;
-    args->base_register = i;
-    while (i < thread_size) {
-        memory[i] = thread_id;
-        i++;
+
+    if (position_selected != -1) {
+      i = position_selected;
+      args->base_register = i;
+      while (i < thread_size) {
+          memory[i] = thread_id;
+          //printf("Memory: %d\n In pos: %d", memory[i], i );
+          i++;
+      }
+      found_space = 1;
+
     }
 
-
+    return found_space;
 }
 
 
