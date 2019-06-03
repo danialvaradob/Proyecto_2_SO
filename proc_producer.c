@@ -118,7 +118,7 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
   struct memoryBlock * head = NULL;
   head = malloc(sizeof(struct memoryBlock));
 
-  
+
   while (i < memory_size) {
     if (memory[i] == 0) {
         avaiable_spaces = 0;
@@ -148,7 +148,7 @@ void print_list(struct memoryBlock * head) {
     while (current != NULL) {
         printf("START:  %d\n", current->start);
         printf("SPACES: %d\n", current->avaiable_spaces);
-        
+
         current = current->next;
     }
 }
@@ -185,7 +185,7 @@ void best_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
     //printf("START POS SELECTED %d\n", position_selected);
     //printf("MIN SIZE DIFFERENCE %d\n",  min_space);
-    
+
     i = position_selected;
     while (i <= thread_size) {
         memory[i] = thread_id;
@@ -600,7 +600,8 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
 
 void* allocate_memory(void* pInfo){
   struct processInfo *args = (struct processInfo *)pInfo;
-  printf("Hi. I'm the process %li\n", syscall(SYS_gettid));
+  printf("Process: %li Size: %d Exec_time: %d\n",
+              syscall(SYS_gettid), args->size, args->execution_time);
   //printf("Size of the memory: %d \n", SIZEOFSHMSEG);
   /*for (int i = 0; i<args->execution_time;i++){
     printf(".");//("%d",args->size);
@@ -664,12 +665,14 @@ int main(){
 
     /* Cycle for creating the threads */
     while (1){
-        fflush(stdout);
+
 
       proc_size = rand() % 10 + 1;
+
+        fflush(stdout);
       exec_time = (rand() % (60 - 20 + 1)) + 20; //num = (rand() % (upper – lower + 1)) + lower
 
-      pthread_t PID;// = pthread_self();
+      pthread_t PID;
       struct processInfo pinfo = {PID, 0, proc_size, exec_time, BLOCKED};
       pthread_create(&PID, NULL, allocate_memory, &pinfo);
       write_log(exec_time, proc_size);
