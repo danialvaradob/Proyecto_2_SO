@@ -453,6 +453,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
 
   // memory released
   release_memory(shm_address,syscall(SYS_gettid), _memory_size);
+  write_to_log("The process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
 
 
   operations[0].sem_num = 0;
@@ -668,7 +669,7 @@ int main(){
 
     /* Cycle for creating the threads */
     while (1){
-
+      srand(time(NULL));
 
       proc_size = rand() % 10 + 1;
 
