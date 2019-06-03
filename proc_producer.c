@@ -118,12 +118,12 @@ struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_si
   struct memoryBlock * head = NULL;
   head = malloc(sizeof(struct memoryBlock));
 
-
+  
   while (i < memory_size) {
     if (memory[i] == 0) {
         avaiable_spaces = 0;
         start = i;
-        while (memory[i] == 0) {
+        while ((i < memory_size) && (memory[i] == 0)) {
             avaiable_spaces++;
             i++;
         }
