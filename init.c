@@ -63,6 +63,14 @@ void save_config(int size){
 
 }
 
+void resetting_states_file(){
+  char* states_filename = "states.txt";
+  FILE* fp = fopen(states_filename, "w");
+  if (fp == NULL) {
+      printf("Could not open file %s",states_filename);
+  }
+  fclose(fp);
+}
 
 int main(int argc, char *argv[])
 {
@@ -70,6 +78,7 @@ int main(int argc, char *argv[])
     printf("Enter the size of the memory (in lines): ");
     scanf("%d",&SIZEOFSHMSEG);
     save_config(SIZEOFSHMSEG);
+    resetting_states_file();
 
     int retval, semid, shmid, i;
     key_t semkey, shmkey;

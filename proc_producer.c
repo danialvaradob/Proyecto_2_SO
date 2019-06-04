@@ -87,7 +87,7 @@ void change_state(char* state){
   FILE *fp;
   char* filename = "states.txt";
   char* msg = "%d - %s\n";
-  sem_t *sem = sem_open(SNAME, O_CREAT, 0644, 3);
+  sem_t *sem = sem_open(SNAME, 0);//sem_open(SNAME, O_CREAT, 0644, 3);
   /*Waiting for the semaphore*/
   sem_wait(sem);
   /*Reading file and creating maze */
@@ -308,7 +308,6 @@ void release_memory(int *_memory, int _thread_id, int _memory_size) {
             memory[i] = 0;
         }
     }
-
 }
 
 
@@ -320,8 +319,11 @@ void release_memory(int *_memory, int _thread_id, int _memory_size) {
 void write_to_log(char* msg, struct processInfo *args, int type){
   FILE *fp;
   char* filename = "log.txt";
+
+  change_state("BLOCKED");
   /*Waiting for the semaphore*/
   sem_wait(&mutex);
+  change_state("IN_CRITICAL_REGION");
   /*Reading file and creating maze */
   fp = fopen(filename, "a");
   if (fp == NULL){
@@ -434,6 +436,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
 
 
   // Thread sleeps
+  change_state("RUNNING");
   sleep(args->execution_time);
   //sleep(1);
   /* Generate the IPC key for the semaphore and memory segment */
@@ -484,7 +487,7 @@ int end_thread_memory(struct processInfo *args,int _memory_size) {
   // memory released
   release_memory(shm_address,syscall(SYS_gettid), _memory_size);
   write_to_log("\nThe process %li freed the memory segment from addresses %d to %d on %s\n", args, 3);
-
+  change_state("DEAD");
 
   operations[0].sem_num = 0;
   operations[0].sem_op =  -1;
@@ -673,6 +676,8 @@ int main(){
     int proc_size, exec_time, producer_wait;
     SIZEOFSHMSEG = get_memory_size();
     sem_init(&mutex, 0, 1);
+    sem_open(SNAME, O_CREAT, 0644, 3);
+
     enum AlgorithmType algorithmNumber;
 
     /* Cycle for validating user's input */
