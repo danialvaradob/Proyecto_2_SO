@@ -7,6 +7,8 @@
 #include <sys/shm.h>
 #include <time.h>
 #include <assert.h>
+#include <fcntl.h>
+#include <semaphore.h>
 
 #define SEMKEYPATH "/dev/null"  /* Path used on ftok for semget key  */
 #define SEMKEYID 1              /* Id used on ftok for semget key    */
@@ -19,7 +21,7 @@
 
 #define NUMMSG 2                /* Server only doing two "receives"
                                    on shm segment                    */
-
+#define SNAME "/state_sem"
 
 void write_to_log(int size){
   FILE *fp;
@@ -65,11 +67,14 @@ void save_config(int size){
 
 void resetting_states_file(){
   char* states_filename = "states.txt";
+  char* states__temp_filename = "states_temp.txt";
   FILE* fp = fopen(states_filename, "w");
+  FILE* fp_temp = fopen(states__temp_filename, "w");
   if (fp == NULL) {
       printf("Could not open file %s",states_filename);
   }
   fclose(fp);
+  fclose(fp_temp);
 }
 
 int main(int argc, char *argv[])
@@ -79,6 +84,7 @@ int main(int argc, char *argv[])
     scanf("%d",&SIZEOFSHMSEG);
     save_config(SIZEOFSHMSEG);
     resetting_states_file();
+    sem_open(SNAME, O_CREAT, 0644, 3);
 
     int retval, semid, shmid, i;
     key_t semkey, shmkey;
