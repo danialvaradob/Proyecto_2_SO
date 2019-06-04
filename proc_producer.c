@@ -320,7 +320,7 @@ int worst_fit(int *_memory, struct processInfo *args,int _memory_size) {
 
 int first_fit(int *_memory, struct processInfo *args,int _memory_size) {
   int *memory;
-  int size,temp ,memory_size, i = 0, counter = 0, flag = 1, thread_id;
+  int size,temp ,memory_size, i = 0, counter = 0, flag = 0, thread_id;
 
 
   memory = _memory;
