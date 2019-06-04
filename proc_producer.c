@@ -333,7 +333,7 @@ int first_fit(int *_memory, struct processInfo *args,int _memory_size) {
         temp = i;
         flag = 1;
         for (counter = 0; counter < size; counter++) {
-            if (memory[temp] != 0) {
+            if ((memory[temp] != 0) || (temp > memory_size)) {
                 flag = 0;
             } else {
                 temp++;
