@@ -83,14 +83,14 @@ void push(struct memoryBlock * head, int _start,int _avaiable_spaces) {
 }
 
 
-void change_state(char* state){
+/*void change_state(char* state){
   FILE *fp;
   char* filename = "states.txt";
   char* msg = "%d - %s\n";
   sem_t *sem = sem_open(SNAME, 0);//sem_open(SNAME, O_CREAT, 0644, 3);
-  /*Waiting for the semaphore*/
+
   sem_wait(sem);
-  /*Reading file and creating maze */
+
   fp = fopen(filename, "a");
   if (fp == NULL) {
       printf("Could not open file %s",filename);
@@ -104,8 +104,79 @@ void change_state(char* state){
 
   fclose(fp);
 
+  sem_post(sem);
+}*/
+void change_state(char* state){
+  FILE *fp;
+  FILE *fp_temp;
+  char* filename = "states.txt";
+  char* filename_temp = "states_temp.txt";
+  char* msg = "%d - %s\n";
+  char* msg2 = "%s\n";
+  char str[MAXCHAR];
+  char id[MAXCHAR];
+  char c;
+  int id_exists_flag = 0;
+  sprintf(id, "%li", syscall(SYS_gettid));
+  sem_t *sem = sem_open(SNAME, O_CREAT, 0644, 3);
+  //sem_destroy(sem);
+  /*Waiting for the semaphore*/
+  sem_wait(sem);
+  /*Reading file and creating maze*/
+  fp = fopen(filename, "r");
+  fp_temp = fopen(filename_temp, "w");
+  //fp_temp = fopen(filename_temp, "a");
+  if (fp == NULL){
+      printf("Could not open file %s",filename);
+  }
+  if (fp_temp == NULL){
+      printf("Could not open file %s",filename_temp);
+  }
+
+  while (fgets(str, MAXCHAR, fp) != NULL){
+    if (strstr(str, id) != NULL) {
+
+      id_exists_flag = 1;
+      fprintf(fp_temp,
+        msg,
+        syscall(SYS_gettid),
+        state);
+    }else{
+      //printf("str: %s\n", str);
+      if (strcmp(str,"\n") != 0 && strcmp(str," ") != 0){
+        fprintf(fp_temp, msg2, str);
+      }
+
+    }
+  }
+  if (id_exists_flag == 0){
+    fprintf(fp_temp,
+      msg,
+      syscall(SYS_gettid),
+      state);
+  }
+
+  fclose(fp);
+  fclose(fp_temp);
+  fp = fopen(filename, "w");
+  fp_temp = fopen(filename_temp, "r");
+  //rewind(fp);
+  //rewind(fp_temp);
+
+  //Updating the states.txt file
+  /*while (fgets(str, MAXCHAR, fp_temp) != NULL){
+              printf("%s\n", "TEST CHANGE_STATE3");
+      fprintf(fp, "%s", str);
+  }*/
+   while( ( c = fgetc(fp_temp) ) != EOF ){
+      fputc(c, fp);
+  }
+  fclose(fp);
+  fclose(fp_temp);
+
   /*Releasing the semaphore*/
   sem_post(sem);
+
 }
 
 struct memoryBlock* create_memory_structure(int *_memory_segment, int _memory_size) {
@@ -177,7 +248,7 @@ int best_fit(int *_memory, struct processInfo *args,int _memory_size) {
         size_difference = space_size - thread_size;
         //printf("Size difference: %d\n", size_difference);
         current = current->next;
-        if ((size_difference <= min_space) && (size_difference >= 0)) {
+        if ((size_difference < min_space) && (size_difference >= 0)) {
             min_space = size_difference;
             position_selected = memory_block_pos;
         }
@@ -323,7 +394,7 @@ void write_to_log(char* msg, struct processInfo *args, int type){
   change_state("BLOCKED");
   /*Waiting for the semaphore*/
   sem_wait(&mutex);
-  change_state("IN_CRITICAL_REGION");
+  //change_state("IN_CRITICAL_REGION");
   /*Reading file and creating maze */
   fp = fopen(filename, "a");
   if (fp == NULL){
@@ -588,11 +659,7 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
       successfull_allocation = best_fit(shm_address, args, _memory_size);
   }
 
-  if (successfull_allocation){
-    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
-  }else{
-    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
-  }
+
 
   /*
   pointer = shm_address + 3;
@@ -629,8 +696,15 @@ int connect_shared_memory(enum AlgorithmType _type, struct processInfo *args, in
     return -1;
   }
 
-  //ending thread
-  end_thread_memory(args, _memory_size);
+
+  if (successfull_allocation){
+    write_to_log("The memory segment from addresses %d to %d was allocated to the process/thread %li on %s\n", args, 1);
+    //ending thread
+    end_thread_memory(args, _memory_size);
+  }else{
+    write_to_log("The process %li couldn't find space in memory and died on %s\n", args, 2);
+    change_state("DEAD");
+  }
 
 }
 
@@ -676,7 +750,7 @@ int main(){
     int proc_size, exec_time, producer_wait;
     SIZEOFSHMSEG = get_memory_size();
     sem_init(&mutex, 0, 1);
-    sem_open(SNAME, O_CREAT, 0644, 3);
+    //sem_open(SNAME, O_CREAT, 0644, 3);
 
     enum AlgorithmType algorithmNumber;
 
@@ -712,8 +786,10 @@ int main(){
       //pthread_join(PID, NULL);
 
       producer_wait = (rand() % (60 - 30 + 1)) + 30;
-      //sleep(2);
-      sleep(producer_wait);
+      sleep(10);
+
+
+      //sleep(producer_wait);
     }
 
     //pthread_join(PID, NULL);

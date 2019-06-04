@@ -191,8 +191,9 @@ int main(int argc, char *argv[]) {
     int option;
     SIZEOFSHMSEG = get_memory_size();
     while (1) {
-        printf("Welcome to the Spy Process.\nEnter 1 for the memory status\nEnter 2 for the proccesses status\nEnter 3 to exit\nResponse: ");
+        printf("\nWelcome to the Spy Process.\nEnter 1 for the memory status\nEnter 2 for the proccesses status\nEnter 3 to exit\nResponse: ");
         scanf("%d",&option);
+        printf("\n");
 
         if (option == 1) {
             show_memory_state();
